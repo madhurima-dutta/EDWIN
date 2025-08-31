@@ -29,12 +29,12 @@ This application helps maritime operators calculate:
 ### Setup Steps
 
 1. **Clone or download the project files**
-   \`\`\`bash
+   ```bash
    # Ensure you have these files:
    # - streamlit_app.py
    # - requirements.txt
    # - .env.example
-   \`\`\`
+   ```
 
 2. **Install dependencies**
    \`\`\`bash
