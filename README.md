@@ -37,23 +37,23 @@ This application helps maritime operators calculate:
    ```
 
 2. **Install dependencies**
-   \`\`\`bash
+   ```bash
    pip install -r requirements.txt
-   \`\`\`
+   ```
 
 3. **Configure environment variables**
-   \`\`\`bash
+   ```bash
    # Copy the example file
    cp .env.example .env
    
    # Edit .env and add your database URL
    DATABASE_URL=postgresql://username:password@host:port/database
-   \`\`\`
+   ```
 
 4. **Run the application**
-   \`\`\`bash
+   ```bash
    streamlit run streamlit_app.py
-   \`\`\`
+   ```
 
 ## Database Schema
 
@@ -95,9 +95,9 @@ The application expects the following database structure:
 ## Configuration
 
 ### Environment Variables
-\`\`\`env
+```env
 DATABASE_URL=your_supabase_postgresql_url
-\`\`\`
+```
 
 ### Fuel Emission Factors
 The application uses standard maritime emission factors:
