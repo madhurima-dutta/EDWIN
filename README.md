@@ -1,4 +1,5 @@
 # Vessel EUAs & FuelEU Maritime Penalty Calculator
+## EDWIN (Emission Data & Web Integration)
 
 A comprehensive Streamlit application for calculating European Union Allowances (EUAs) and FuelEU Maritime penalties for vessel operations in EU waters.
 
