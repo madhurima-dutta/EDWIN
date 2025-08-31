@@ -31,9 +31,9 @@ This application helps maritime operators calculate:
 1. **Clone or download the project files**
    ```bash
    # Ensure you have these files:
-   # - streamlit_app.py
-   # - requirements.txt
-   # - .env.example
+   - streamlit_app.py
+   - requirements.txt
+   - .env.example
    ```
 
 2. **Install dependencies**
@@ -138,4 +138,4 @@ For technical support or questions about maritime regulations:
 
 ---
 
-**Suggested App URL**: `vessel-euas-calculator`
+**Suggested App URL**: `vessel-euas-calculator` (Not given for confidentiality purposes)
