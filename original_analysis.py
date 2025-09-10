@@ -18,32 +18,78 @@ SUPABASE_DB_URL = os.getenv("SUPABASE_DB_URL") or "postgresql://postgres.gyzsjok
 # --- SQLAlchemy engine (for pandas) ---
 engine = create_engine(SUPABASE_DB_URL)
  
-# --- Fetch tables into DataFrames ---
+# --- Fetch tables into DataFrames ------------------------------------------------------------------------------------------------------------
 df_vessel = pd.read_sql("SELECT * FROM vessel_reports", con=engine)
 df_ports = pd.read_sql("SELECT * FROM \"Port_Name_List\"", con=engine)  # Quotes if camel case or uppercase
 df_country = pd.read_sql("SELECT * FROM \"country_code_list\"", con=engine)
 df_CapeFerrol = pd.read_sql("SELECT * FROM \"cape_ferrol\"", con =engine)
 
-# Ensure phase_end_date is datetime
-df_CapeFerrol['phase_end_date'] = pd.to_datetime(df_CapeFerrol['phase_end_date'])
-df_CapeFerrol['date_str'] = df_CapeFerrol['phase_end_date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+# Replace df_CapeFerrol with df_vessel
+df_vessel['phase_end_date'] = pd.to_datetime(df_vessel['phase_end_date'])
+df_vessel['date_str'] = df_vessel['phase_end_date'].dt.strftime('%Y-%m-%d %H:%M:%S')
 
-# Fill missing start_port with end_port where phase is ALL FAST
-df_CapeFerrol.loc[
-    (df_CapeFerrol['phase'].str.upper() == 'ALL FAST') & (df_CapeFerrol['start_port'].isna()),
+#------------------------------------ Filling All Fast and Last Line ports-----------------------------------------------------------------
+
+df_vessel.loc[
+    (df_vessel['phase'].str.upper() == 'ALL FAST') & (df_vessel['start_port'].isna()),
     'start_port'
-] = df_CapeFerrol.loc[
-    (df_CapeFerrol['phase'].str.upper() == 'ALL FAST') & (df_CapeFerrol['start_port'].isna()),
+] = df_vessel.loc[
+    (df_vessel['phase'].str.upper() == 'ALL FAST') & (df_vessel['start_port'].isna()),
     'end_port'
 ]
 
-# Truncate ports
-df_CapeFerrol['start_port'] = df_CapeFerrol['start_port'].astype(str).str[:5]
-df_CapeFerrol['end_port'] = df_CapeFerrol['end_port'].astype(str).str[:5]
 
-# Widget Setup
+#------------------------------------Taking the first 5 letters from the port codes---------------------------------------------------------
+
+df_vessel['start_port'] = df_vessel['start_port'].astype(str).str[:5]
+df_vessel['end_port'] = df_vessel['end_port'].astype(str).str[:5]
+
+
+# ----------------------------------- Normalize phase to uppercase and strip spaces --------------------------------------------------------
+
+df_vessel['phase'] = df_vessel['phase'].str.strip().str.upper()
+
+# ---------------------------- Fix cargo_mt consistency across voyage phases BEFORE filtering ----------------------------------------------
+
+# Ensure dataframe is sorted
+df_vessel.sort_values(['vessel_name', 'phase_end_date'], inplace=True)
+
+for idx in df_vessel[df_vessel['phase'] == 'EOSP'].index:
+    vessel = df_vessel.at[idx, 'vessel_name']
+    cargo_val = df_vessel.at[idx, 'cargo_mt']
+    phase_end_date = df_vessel.at[idx, 'phase_end_date']
+    
+    # Find the LAST LINE just before this EOSP
+    prev_rows = df_vessel[
+        (df_vessel['vessel_name'] == vessel) &
+        (df_vessel['phase'] == 'LAST LINE') &
+        (df_vessel['phase_end_date'] < phase_end_date)
+    ]
+    
+    if not prev_rows.empty:
+        # Get the latest LAST LINE before EOSP
+        last_idx = prev_rows.index[-1]
+        if pd.isna(df_vessel.at[last_idx, 'cargo_mt']) or df_vessel.at[last_idx, 'cargo_mt'] == 0:
+            df_vessel.at[last_idx, 'cargo_mt'] = cargo_val
+
+    # ----- Update ALL FAST after EOSP -----
+    next_rows = df_vessel[
+        (df_vessel['vessel_name'] == vessel) &
+        (df_vessel['phase'] == 'ALL FAST') &
+        (df_vessel['phase_end_date'] > phase_end_date)
+    ]
+    if not next_rows.empty:
+        first_idx = next_rows.index[0]   # earliest ALL FAST after EOSP
+        if pd.isna(df_vessel.at[first_idx, 'cargo_mt']) or df_vessel.at[first_idx, 'cargo_mt'] == 0:
+            df_vessel.at[first_idx, 'cargo_mt'] = cargo_val
+
+
+
+
+#----------------------------------------------------- Widget Setup ---------------------------------------------------------------------------
+
 vessel_dropdown = widgets.Dropdown(
-    options=sorted(df_CapeFerrol['vessel_name'].unique().tolist()),
+    options=sorted(df_vessel['vessel_name'].unique().tolist()),
     description='Select Vessel:',
     style={'description_width': 'initial'},
     layout=widgets.Layout(width='50%')
@@ -63,7 +109,8 @@ to_date_picker = widgets.DatePicker(
 
 output_box = widgets.Output()
 
-# Function to enforce from-to date rule
+#------------------------------------------- Function to enforce from-to date rule-----------------------------------------------------
+
 def enforce_to_date_limit(*args):
     from_date = from_date_picker.value
     to_date = to_date_picker.value
@@ -77,7 +124,10 @@ def enforce_to_date_limit(*args):
 
     display_filtered_data()
 
-# Function to display filtered data
+
+
+#---------------------------------------------- Function to display filtered data--------------------------------------------------------
+
 def display_filtered_data(*args):
     output_box.clear_output()
     with output_box:
@@ -90,13 +140,13 @@ def display_filtered_data(*args):
             to_date_str = to_date.strftime('%Y-%m-%d')
 
             mask = (
-                (df_CapeFerrol['vessel_name'] == vessel) &
-                (df_CapeFerrol['phase_end_date'].dt.date >= from_date) &
-                (df_CapeFerrol['phase_end_date'].dt.date <= to_date) &
-                (df_CapeFerrol['phase'].str.upper().isin(['ALL FAST', 'LAST LINE']))
+                (df_vessel['vessel_name'] == vessel) &
+                (df_vessel['phase_end_date'].dt.date >= from_date) &
+                (df_vessel['phase_end_date'].dt.date <= to_date) &
+                (df_vessel['phase'].isin(['ALL FAST', 'LAST LINE']))
             )
 
-            final_df = df_CapeFerrol[mask].copy()
+            final_df = df_vessel[mask].copy()
             final_df['port'] = final_df['start_port']
             final_df = final_df.sort_values(by='phase_end_date').reset_index(drop=True)
 
@@ -105,31 +155,44 @@ def display_filtered_data(*args):
                 'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
                 'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn'
             ], keep='first').reset_index(drop=True)
+            
 
+#---------------------------------Placing the Bunker values properly (For Display 1) ------------------------------------------------------------
+            
             for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
                 rob_col = f'{fuel}_rob'
                 bdn_col = f'{fuel}_bdn'
                 calc_col = f'cal_{fuel}_con'
 
-                final_df[calc_col] = (
-                    final_df[rob_col].shift(1) + final_df[bdn_col] - final_df[rob_col]
-                )
-                final_df.loc[0, calc_col] = None
-
+                # initialize consumption
+                final_df[calc_col] = None  
+            
                 for i in range(1, len(final_df)):
-                    if final_df.at[i, calc_col] < 0 and final_df.at[i, bdn_col] == 0:
-                        current_date = final_df.at[i, 'phase_end_date']
-                        next_bdn = df_CapeFerrol[
-                            (df_CapeFerrol['vessel_name'] == vessel) &
-                            (df_CapeFerrol['phase_end_date'] > current_date) &
-                            (df_CapeFerrol[bdn_col] > 0)
-                        ].sort_values('phase_end_date')[bdn_col].head(1)
+                    prev_date = final_df.at[i-1, 'phase_end_date']
+                    curr_date = final_df.at[i, 'phase_end_date']
+            
+                    # Sum BDN values between (prev_date, curr_date]
+                    bdn_sum = df_vessel[
+                        (df_vessel['vessel_name'] == vessel) &
+                        (df_vessel['phase_end_date'] > prev_date) &
+                        (df_vessel['phase_end_date'] <= curr_date)
+                    ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
+            
+                    if pd.isna(bdn_sum):
+                        bdn_sum = 0  # default if no BDN found
+            
+                    # Update BDN for current row
+                    final_df.at[i, bdn_col] = bdn_sum
+            
+                    # Calculate consumption
+                    final_df.at[i, calc_col] = (
+                        final_df.at[i-1, rob_col] + 
+                        final_df.at[i, bdn_col] - 
+                        final_df.at[i, rob_col]
+                    )
 
-                        if not next_bdn.empty:
-                            final_df.at[i, bdn_col] = next_bdn.values[0]
-                            final_df.at[i, calc_col] = (
-                                final_df.at[i - 1, rob_col] + final_df.at[i, bdn_col] - final_df.at[i, rob_col]
-                            )
+#------------------------------------------------------------------------------------------------------------------------------------------------
+            
 
             print(f"\n Display 1: All 'ALL FAST' & 'LAST LINE' Data from {from_date_str} to {to_date_str} for '{vessel}':")
             display(final_df[[
@@ -139,51 +202,60 @@ def display_filtered_data(*args):
                 'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con'
             ]])
 
+            # Remove AF–LL duplicates
             rows_to_remove = []
             i = 0
             while i < len(final_df) - 1:
                 row_af = final_df.iloc[i]
                 row_ll = final_df.iloc[i + 1]
-                if row_af['phase'].upper() == 'ALL FAST' and row_ll['phase'].upper() == 'LAST LINE':
+                if row_af['phase'] == 'ALL FAST' and row_ll['phase'] == 'LAST LINE':
                     if row_af['cargo_mt'] == row_ll['cargo_mt']:
                         rows_to_remove.extend([i, i + 1])
                     i += 2
                 else:
                     i += 1
 
+#-----------------------------Display 1 making completed and going forward to make display 2 -----------------------------------------------------
+            
             filtered_df_2 = final_df.drop(index=rows_to_remove).reset_index(drop=True)
 
-            filtered_df_2.to_sql(
-                "Cape_Ferrol_EUA_Summary",  # Table name in MySQL
-                engine,
-                if_exists="replace",  # Change to 'replace' if you want to overwrite instead of append
-                index=False
-            )
+
+#---------------------------------Placing the Bunker values properly (For Display 2) -----------------------------------------------------------
 
             for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
                 rob_col = f'{fuel}_rob'
                 bdn_col = f'{fuel}_bdn'
                 calc_col = f'cal_{fuel}_con'
 
-                filtered_df_2[calc_col] = (
-                    filtered_df_2[rob_col].shift(1) + filtered_df_2[bdn_col] - filtered_df_2[rob_col]
-                )
-                filtered_df_2.loc[0, calc_col] = None
-
+                # initialize consumption
+                filtered_df_2[calc_col] = None  
+            
                 for i in range(1, len(filtered_df_2)):
-                    if filtered_df_2.at[i, calc_col] < 0 and filtered_df_2.at[i, bdn_col] == 0:
-                        current_date = filtered_df_2.at[i, 'phase_end_date']
-                        next_bdn = df_CapeFerrol[
-                            (df_CapeFerrol['vessel_name'] == vessel) &
-                            (df_CapeFerrol['phase_end_date'] > current_date) &
-                            (df_CapeFerrol[bdn_col] > 0)
-                        ].sort_values('phase_end_date')[bdn_col].head(1)
+                    prev_date = filtered_df_2.at[i-1, 'phase_end_date']
+                    curr_date = filtered_df_2.at[i, 'phase_end_date']
+            
+                    # Sum BDN values between (prev_date, curr_date]
+                    bdn_sum = df_vessel[
+                        (df_vessel['vessel_name'] == vessel) &
+                        (df_vessel['phase_end_date'] > prev_date) &
+                        (df_vessel['phase_end_date'] <= curr_date)
+                    ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
+            
+                    if pd.isna(bdn_sum):
+                        bdn_sum = 0  # default if no BDN found
+            
+                    # Update BDN for current row
+                    filtered_df_2.at[i, bdn_col] = bdn_sum
+            
+                    # Calculate consumption
+                    filtered_df_2.at[i, calc_col] = (
+                        filtered_df_2.at[i-1, rob_col] + 
+                        filtered_df_2.at[i, bdn_col] - 
+                        filtered_df_2.at[i, rob_col]
+                    )
 
-                        if not next_bdn.empty:
-                            filtered_df_2.at[i, bdn_col] = next_bdn.values[0]
-                            filtered_df_2.at[i, calc_col] = (
-                                filtered_df_2.at[i - 1, rob_col] + filtered_df_2.at[i, bdn_col] - filtered_df_2.at[i, rob_col]
-                            )
+#------------------------------------------------------------------------------------------------------------------------------------------------
+
 
             filtered_df_2['Carbon emitted'] = (
                 filtered_df_2['cal_hfo_con'].fillna(0) * 3.114 +
@@ -198,7 +270,10 @@ def display_filtered_data(*args):
             filtered_df_2['Country Code'] = (
                 filtered_df_2['port'].astype(str).str[:2].str.upper().map(eu_mapping).fillna('non-EU')
             )
+            
 
+#---------------------------------------Mapping EU, NonEU to calculate properly ------------------------------------------------------------------
+            
             EUAs = []
             for i in range(len(filtered_df_2)):
                 if i == 0:
@@ -220,14 +295,106 @@ def display_filtered_data(*args):
                         else:
                             EUAs.append(0.0)
 
+
+            cal_FuelEU_hfo_con = []
+            for i in range(len(filtered_df_2)):
+                if i == 0:
+                    cal_FuelEU_hfo_con.append(0.0)
+                else:
+                    curr_country = filtered_df_2.loc[i, 'Country Code']
+                    prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+                    curr_port = filtered_df_2.loc[i, 'port']
+                    prev_port = filtered_df_2.loc[i - 1, 'port']
+                    cal_hfo_con = filtered_df_2.loc[i, 'cal_hfo_con']
+
+                    if curr_port == prev_port:
+                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    else:
+                        if curr_country == 'EU' and prev_country == 'EU':
+                            cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3))
+                        elif curr_country == 'EU' or prev_country == 'EU':
+                            cal_FuelEU_hfo_con.append(round(cal_hfo_con *  0.5, 3))
+                        else:
+                            cal_FuelEU_hfo_con.append(0.0)
+
+            cal_FuelEU_lfo_con = []
+            for i in range(len(filtered_df_2)):
+                if i == 0:
+                    cal_FuelEU_lfo_con.append(0.0)
+                else:
+                    curr_country = filtered_df_2.loc[i, 'Country Code']
+                    prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+                    curr_port = filtered_df_2.loc[i, 'port']
+                    prev_port = filtered_df_2.loc[i - 1, 'port']
+                    cal_lfo_con = filtered_df_2.loc[i, 'cal_lfo_con']
+
+                    if curr_port == prev_port:
+                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    else:
+                        if curr_country == 'EU' and prev_country == 'EU':
+                            cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3))
+                        elif curr_country == 'EU' or prev_country == 'EU':
+                            cal_FuelEU_lfo_con.append(round(cal_lfo_con *  0.5, 3))
+                        else:
+                            cal_FuelEU_lfo_con.append(0.0)
+
+            cal_FuelEU_mgo_con = []
+            for i in range(len(filtered_df_2)):
+                if i == 0:
+                    cal_FuelEU_mgo_con.append(0.0)
+                else:
+                    curr_country = filtered_df_2.loc[i, 'Country Code']
+                    prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+                    curr_port = filtered_df_2.loc[i, 'port']
+                    prev_port = filtered_df_2.loc[i - 1, 'port']
+                    cal_mgo_con = filtered_df_2.loc[i, 'cal_mgo_con']
+
+                    if curr_port == prev_port:
+                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    else:
+                        if curr_country == 'EU' and prev_country == 'EU':
+                            cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3))
+                        elif curr_country == 'EU' or prev_country == 'EU':
+                            cal_FuelEU_mgo_con.append(round(cal_mgo_con *  0.5, 3))
+                        else:
+                            cal_FuelEU_mgo_con.append(0.0)
+
+            cal_FuelEU_lng_con = []
+            for i in range(len(filtered_df_2)):
+                if i == 0:
+                    cal_FuelEU_lng_con.append(0.0)
+                else:
+                    curr_country = filtered_df_2.loc[i, 'Country Code']
+                    prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+                    curr_port = filtered_df_2.loc[i, 'port']
+                    prev_port = filtered_df_2.loc[i - 1, 'port']
+                    cal_lng_con = filtered_df_2.loc[i, 'cal_lng_con']
+
+                    if curr_port == prev_port:
+                        cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    else:
+                        if curr_country == 'EU' and prev_country == 'EU':
+                            cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3))
+                        elif curr_country == 'EU' or prev_country == 'EU':
+                            cal_FuelEU_lng_con.append(round(cal_lng_con *  0.5, 3))
+                        else:
+                            cal_FuelEU_lng_con.append(0.0)
+
+
             filtered_df_2['EUAs'] = EUAs
+            filtered_df_2['cal_FuelEU_hfo_con'] = cal_FuelEU_hfo_con
+            filtered_df_2['cal_FuelEU_lfo_con'] = cal_FuelEU_lfo_con
+            filtered_df_2['cal_FuelEU_mgo_con'] = cal_FuelEU_mgo_con
+            filtered_df_2['cal_FuelEU_lng_con'] = cal_FuelEU_lng_con
+
 
             print(f"\n Display 2: Cargo-Changing Legs Only (Excludes same cargo_mt AF–LL pairs):")
             display(filtered_df_2[[
                 'phase_end_date', 'phase', 'Country Code', 'port', 'cargo_mt',
                 'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
                 'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn',
-                'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con',
+                'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con', 'cal_FuelEU_hfo_con',
+                'cal_FuelEU_lfo_con', 'cal_FuelEU_mgo_con', 'cal_FuelEU_lng_con',
                 'Carbon emitted', 'EUAs'
             ]])            
 
@@ -279,10 +446,10 @@ def display_filtered_data(*args):
 
                 
                 # Now print total fuel consumption after the summary table
-                total_hfo_cons = round(filtered_df_2['cal_hfo_con'].sum(skipna=True), 3)
-                total_lfo_cons = round(filtered_df_2['cal_lfo_con'].sum(skipna=True), 3)
-                total_mgo_cons = round(filtered_df_2['cal_mgo_con'].sum(skipna=True), 3)
-                total_lng_cons = round(filtered_df_2['cal_lng_con'].sum(skipna=True), 3)
+                total_hfo_cons = round(filtered_df_2['cal_FuelEU_hfo_con'].sum(skipna=True), 3)
+                total_lfo_cons = round(filtered_df_2['cal_FuelEU_lfo_con'].sum(skipna=True), 3)
+                total_mgo_cons = round(filtered_df_2['cal_FuelEU_mgo_con'].sum(skipna=True), 3)
+                total_lng_cons = round(filtered_df_2['cal_FuelEU_lng_con'].sum(skipna=True), 3)
                 
                 
                 # Step 1: Convert to micro-units (tonnes * 10^6)
@@ -311,20 +478,34 @@ def display_filtered_data(*args):
                 sum_2 = (a * HFO_LCV) + (b * LFO_LCV) + (c * MGO_LCV)
 
                 # Step 5: Calculating WtT
-                WtT = sum_1/sum_2
+                if sum_2 == 0:
+                    WtT = 0
+                else:
+                    WtT = sum_1/sum_2
 
                 # Step 6: Calculating TtW
                 sum_3 = a * HFO_TtW + b * LFO_TtW + c * MGO_TtW
-                TtW = sum_3/sum_2
+
+                if sum_3 == 0 :
+                    TtW = 0
+                else :
+                    TtW = sum_3/sum_2
 
                 # Final Steps
                 GHG_Ints_Act = WtT + TtW
                 GHG_Ints_Tar = 89.3368
                 value = abs(GHG_Ints_Act - GHG_Ints_Tar)
-                CB_Def = (value * sum_2)
-                Penalty = (CB_Def * 2400) / (GHG_Ints_Act * 41000)
 
+                if sum_2 == 0:
+                    CB_Def = 0
+                else:
+                    CB_Def = (value * sum_2)
 
+                if GHG_Ints_Act == 0:
+                    Penalty = 0
+                else:
+                    Penalty = (CB_Def * 2400) / (GHG_Ints_Act * 41000)
+                
 
                 # Create a DataFrame for the second summary
                 table_4 = pd.DataFrame({
@@ -344,11 +525,7 @@ def display_filtered_data(*args):
                 # Use same CSS styling
                 styled_html_2 = table_4.to_html(index=False, border=1, justify='center', classes='styled-table')
                 display(HTML(css + styled_html_2))
-                table_4.to_sql("Cape_Ferrol_FuelEU_summary",  # Table name in MySQL
-                engine,
-                if_exists="replace",  # Change to 'replace' if you want to overwrite instead of append
-                index=False
-                )
+                
 
                 # Take the first row from table_4 and repeat to match filtered_df_2 length
                 row_2nd_repeated = pd.DataFrame([table_4.iloc[0]] * len(filtered_df_2)).reset_index(drop=True)
@@ -356,22 +533,13 @@ def display_filtered_data(*args):
                 # Merge both DataFrames side-by-side
                 merged_df = pd.concat([filtered_df_2.reset_index(drop=True), row_2nd_repeated], axis=1)
                 
-                # Save merged DataFrame to MySQL (or SQLite)
-                merged_df.to_sql(
-                    "Cape_Ferrol_Merged",  # New table name
-                    engine,                # Your DB engine
-                    if_exists="replace",   # Overwrite if table already exists
-                    index=False
-                )
 
             else:
                 print("\nNo data available for summary table.")
-
         else:
             print("Please select both From Date and To Date (To Date must be on/after From Date).")
 
-
-
+# Attach widget events
 vessel_dropdown.observe(display_filtered_data, names='value')
 from_date_picker.observe(enforce_to_date_limit, names='value')
 to_date_picker.observe(display_filtered_data, names='value')
