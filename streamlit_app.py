@@ -173,53 +173,32 @@ if df_vessel is not None:
             bdn_col = f'{fuel}_bdn'
             calc_col = f'cal_{fuel}_con'
             
-            final_df[calc_col] = (
-                final_df[rob_col].shift(1) + final_df[bdn_col] - final_df[rob_col]
-            )
-            final_df.loc[0, calc_col] = None
+            # initialize consumption
+            final_df[calc_col] = None  
             
-        for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
-                rob_col = f'{fuel}_rob'
-                bdn_col = f'{fuel}_bdn'
-                calc_col = f'cal_{fuel}_con'
-                
-                for i in range(1, len(final_df)):
-                    current_consumption = final_df.at[i, calc_col]
-                    current_bdn = final_df.at[i, bdn_col]
-                    
-                    # Check if consumption is negative and BDN is zero or missing
-                    if (pd.notna(current_consumption) and current_consumption < 0 and 
-                        (pd.isna(current_bdn) or current_bdn == 0)):
-                        
-                        current_date = final_df.at[i, 'phase_end_date']
-                        
-                        # Look for the most recent BDN before this date
-                        prev_bdn_data = df_vessel[
-                            (df_vessel['vessel_name'] == vessel) &
-                            (df_vessel['phase_end_date'] < current_date) &
-                            (df_vessel[bdn_col] > 0) &
-                            (pd.notna(df_vessel[bdn_col]))
-                        ].sort_values('phase_end_date')
-                        
-                        if not prev_bdn_data.empty:
-                            # Get the most recent BDN value
-                            latest_bdn = prev_bdn_data[bdn_col].iloc[-1]
-                            final_df.at[i, bdn_col] = latest_bdn
-                            
-                            # Recalculate consumption with the new BDN value
-                            if i > 0:  # Ensure we have a previous ROB value
-                                final_df.at[i, calc_col] = (
-                                    final_df.at[i - 1, rob_col] + 
-                                    final_df.at[i, bdn_col] - 
-                                    final_df.at[i, rob_col]
-                                )
-                            
-                            print(f"Fixed {fuel.upper()} BDN for row {i}: Applied BDN value {latest_bdn}")
-                        else:
-                            print(f"Warning: No previous {fuel.upper()} BDN found for row {i} on {current_date}")
-                    
-                    elif (pd.notna(current_consumption) and current_consumption < -1000):
-                        print(f"Warning: Extremely negative {fuel.upper()} consumption ({current_consumption}) at row {i}")
+            for i in range(1, len(final_df)):
+                prev_date = final_df.at[i-1, 'phase_end_date']
+                curr_date = final_df.at[i, 'phase_end_date']
+            
+                # Sum BDN values between (prev_date, curr_date]
+                bdn_sum = df_vessel[
+                    (df_vessel['vessel_name'] == vessel) &
+                    (df_vessel['phase_end_date'] > prev_date) &
+                    (df_vessel['phase_end_date'] <= curr_date)
+                ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
+            
+                if pd.isna(bdn_sum):
+                    bdn_sum = 0  # default if no BDN found
+            
+                # Update BDN for current row
+                final_df.at[i, bdn_col] = bdn_sum
+            
+                # Calculate consumption
+                final_df.at[i, calc_col] = (
+                    final_df.at[i-1, rob_col] + 
+                    final_df.at[i, bdn_col] - 
+                    final_df.at[i, rob_col]
+                )
         
         # Remove cargo-matching AF-LL pairs
         rows_to_remove = []
@@ -245,53 +224,32 @@ if df_vessel is not None:
             bdn_col = f'{fuel}_bdn'
             calc_col = f'cal_{fuel}_con'
             
-            filtered_df_2[calc_col] = (
-                filtered_df_2[rob_col].shift(1) + filtered_df_2[bdn_col] - filtered_df_2[rob_col]
-            )
-            filtered_df_2.loc[0, calc_col] = None
-
-        for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
-            rob_col = f'{fuel}_rob'
-            bdn_col = f'{fuel}_bdn'
-            calc_col = f'cal_{fuel}_con'
-                
+            # initialize consumption
+            filtered_df_2[calc_col] = None  
+            
             for i in range(1, len(filtered_df_2)):
-                current_consumption = filtered_df_2.at[i, calc_col]
-                current_bdn = filtered_df_2.at[i, bdn_col]
-                    
-                # Check if consumption is negative and BDN is zero or missing
-                if (pd.notna(current_consumption) and current_consumption < 0 and 
-                    (pd.isna(current_bdn) or current_bdn == 0)):
-                        
-                    current_date = filtered_df_2.at[i, 'phase_end_date']
-                        
-                    # Look for the most recent BDN before this date
-                    prev_bdn_data = df_vessel[
-                        (df_vessel['vessel_name'] == vessel) &
-                        (df_vessel['phase_end_date'] < current_date) &
-                        (df_vessel[bdn_col] > 0) &
-                        (pd.notna(df_vessel[bdn_col]))
-                    ].sort_values('phase_end_date')
-                        
-                    if not prev_bdn_data.empty:
-                        # Get the most recent BDN value
-                        latest_bdn = prev_bdn_data[bdn_col].iloc[-1]
-                        filtered_df_2.at[i, bdn_col] = latest_bdn
-                            
-                        # Recalculate consumption with the new BDN value
-                        if i > 0:  # Ensure we have a previous ROB value
-                            filtered_df_2.at[i, calc_col] = (
-                                filtered_df_2.at[i - 1, rob_col] + 
-                                filtered_df_2.at[i, bdn_col] - 
-                                filtered_df_2.at[i, rob_col]
-                            )
-                            
-                        print(f"Fixed {fuel.upper()} BDN for row {i}: Applied BDN value {latest_bdn}")
-                    else:
-                        print(f"Warning: No previous {fuel.upper()} BDN found for row {i} on {current_date}")
-                    
-                elif (pd.notna(current_consumption) and current_consumption < -1000):
-                    print(f"Warning: Extremely negative {fuel.upper()} consumption ({current_consumption}) at row {i}")
+                prev_date = filtered_df_2.at[i-1, 'phase_end_date']
+                curr_date = filtered_df_2.at[i, 'phase_end_date']
+            
+                # Sum BDN values between (prev_date, curr_date]
+                bdn_sum = df_vessel[
+                    (df_vessel['vessel_name'] == vessel) &
+                    (df_vessel['phase_end_date'] > prev_date) &
+                    (df_vessel['phase_end_date'] <= curr_date)
+                ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
+            
+                if pd.isna(bdn_sum):
+                    bdn_sum = 0  # default if no BDN found
+            
+                # Update BDN for current row
+                filtered_df_2.at[i, bdn_col] = bdn_sum
+            
+                # Calculate consumption
+                filtered_df_2.at[i, calc_col] = (
+                    filtered_df_2.at[i-1, rob_col] + 
+                    filtered_df_2.at[i, bdn_col] - 
+                    filtered_df_2.at[i, rob_col]
+                )
         
         # Calculate carbon emissions
         filtered_df_2['Carbon emitted'] = (
