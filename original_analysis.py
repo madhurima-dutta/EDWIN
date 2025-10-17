@@ -24,6 +24,12 @@ df_ports = pd.read_sql("SELECT * FROM \"Port_Name_List\"", con=engine)  # Quotes
 df_country = pd.read_sql("SELECT * FROM \"country_code_list\"", con=engine)
 df_CapeFerrol = pd.read_sql("SELECT * FROM \"cape_ferrol\"", con =engine)
 
+
+#--------------------------------------------
+#           MAIN LOGIC GOT STARTED
+#--------------------------------------------
+
+
 # Replace df_CapeFerrol with df_vessel
 df_vessel['phase_end_date'] = pd.to_datetime(df_vessel['phase_end_date'])
 df_vessel['date_str'] = df_vessel['phase_end_date'].dt.strftime('%Y-%m-%d %H:%M:%S')
@@ -264,38 +270,103 @@ def display_filtered_data(*args):
                 filtered_df_2['cal_lng_con'].fillna(0) * 2.75
             ).round(3)
 
-            df_country['port_code'] = df_country['country'].str[:2].str.upper()
-            eu_mapping = dict(zip(df_country['country_code'].str.upper(), df_country['EU_membership']))
+            port_to_country = df_ports.set_index('Port Code')['EU Ports'].to_dict()
+            port_to_omr = df_ports.set_index('Port Code')['OMR'].to_dict()
 
-            filtered_df_2['Country Code'] = (
-                filtered_df_2['port'].astype(str).str[:2].str.upper().map(eu_mapping).fillna('non-EU')
-            )
-            
+            filtered_df_2['Country Code'] = filtered_df_2['port'].map(port_to_country)
+            filtered_df_2['OMR'] = filtered_df_2['port'].map(port_to_omr)
 
 #---------------------------------------Mapping EU, NonEU to calculate properly ------------------------------------------------------------------
             
             EUAs = []
+
             for i in range(len(filtered_df_2)):
                 if i == 0:
                     EUAs.append(0.0)
-                else:
-                    curr_country = filtered_df_2.loc[i, 'Country Code']
-                    prev_country = filtered_df_2.loc[i - 1, 'Country Code']
-                    curr_port = filtered_df_2.loc[i, 'port']
-                    prev_port = filtered_df_2.loc[i - 1, 'port']
-                    carbon_emitted = filtered_df_2.loc[i, 'Carbon emitted']
-
-                    if curr_port == prev_port:
-                        EUAs.append(round(carbon_emitted * 0.7, 3) if curr_country == 'EU' else 0.0)
-                    else:
-                        if curr_country == 'EU' and prev_country == 'EU':
-                            EUAs.append(round(carbon_emitted * 0.7, 3))
-                        elif curr_country == 'EU' or prev_country == 'EU':
-                            EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
-                        else:
+                    continue
+            
+                curr_country = filtered_df_2.loc[i, 'Country Code']
+                prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+                curr_port = filtered_df_2.loc[i, 'port']
+                prev_port = filtered_df_2.loc[i - 1, 'port']
+                curr_OMR = filtered_df_2.loc[i, 'OMR']
+                prev_OMR = filtered_df_2.loc[i - 1, 'OMR']
+                carbon_emitted = filtered_df_2.loc[i, 'Carbon emitted']
+            
+                # ---- Safe forward look ----
+                next_country = filtered_df_2.loc[i + 1, 'Country Code'] if i < len(filtered_df_2) - 1 else None
+                next_OMR = filtered_df_2.loc[i + 1, 'OMR'] if i < len(filtered_df_2) - 1 else None
+            
+                # ---- Safe backward look ----
+                two_back_prev_country = filtered_df_2.loc[i - 2, 'Country Code'] if i >= 2 else None
+                two_back_prev_OMR = filtered_df_2.loc[i - 2, 'OMR'] if i >= 2 else None
+            
+                # ---- Safe forward 2 look ----
+                two_fwd_next_country = filtered_df_2.loc[i + 2, 'Country Code'] if i < len(filtered_df_2) - 2 else None
+                two_fwd_next_OMR = filtered_df_2.loc[i + 2, 'OMR'] if i < len(filtered_df_2) - 2 else None
+            
+                # ===================================================================
+                #                  MAIN EUA LOGIC (corrected)
+                # ===================================================================
+            
+                # ---------- Case 1: Port Consumption ----------
+                if curr_port == prev_port:
+                    if curr_country == 'EU' and two_back_prev_country == 'EU' and curr_OMR == 'No' and two_back_prev_OMR == 'Yes' :
+                        if curr_country[:2] == two_back_prev_country[:2] :
                             EUAs.append(0.0)
+                        else:
+                            EUAs.append(round(carbon_emitted * 0.7, 3))
+            
+                    elif curr_country == 'EU' and next_country == 'EU' and curr_OMR == 'No' and next_OMR == 'Yes' :
+                        if curr_country[:2] == next_country[:2]:
+                            EUAs.append(0.0)
+                        else:
+                            EUAs.append(round(carbon_emitted * 0.7, 3))
 
+                    elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
+                        EUAs.append(0.0)
 
+                    elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
+                        EUAs.append(0.0)
+
+                    else:
+                        EUAs.append(round(carbon_emitted * 0.7, 3))
+            
+                # ---------- Case 2: Voyage consumption ----------
+                else:
+                    # (1) Current EU+No and Previous EU+No → Full 70%
+                    if curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                        EUAs.append(round(carbon_emitted * 0.7, 3))
+
+                    elif curr_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'Yes' and curr_country[:2] == prev_country[:2]: #OMR to Mainland
+                        EUAs.append(0.0)
+                    
+            
+                    # (2) Current EU+No OR Previous EU+No → 50%
+                    elif curr_country == 'EU' and curr_OMR == 'No' and prev_country == 'Non-EU' :
+                        EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+                    elif curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'No':
+                        EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+                    elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
+                        EUAs.append(0.0)
+            
+                    # (3) OMR to OMR voyage
+                    elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
+                        if curr_country[:2] == prev_country[:2]:
+                            EUAs.append(0.0)
+                        else:
+                            EUAs.append(round(carbon_emitted * 0.7, 3))
+            
+                    # (4) Mixed EU–NonEU + OMR transitions → half rate
+                    elif (curr_country == 'EU' and prev_country == 'Non-EU' and curr_OMR == 'Yes') or (curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'Yes'):
+                        EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+            
+                    else:
+                        EUAs.append(0.0)
+
+                    
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------
             cal_FuelEU_hfo_con = []
             for i in range(len(filtered_df_2)):
                 if i == 0:
@@ -307,15 +378,18 @@ def display_filtered_data(*args):
                     prev_port = filtered_df_2.loc[i - 1, 'port']
                     cal_hfo_con = filtered_df_2.loc[i, 'cal_hfo_con']
 
-                    if curr_port == prev_port:
-                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3))
+                    elif prev_country == 'Non-EU' and curr_country == 'EU':
+                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3)) 
+                    elif prev_country == 'EU' and curr_country == 'Non-EU':
+                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3))
                     else:
-                        if curr_country == 'EU' and prev_country == 'EU':
-                            cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3))
-                        elif curr_country == 'EU' or prev_country == 'EU':
-                            cal_FuelEU_hfo_con.append(round(cal_hfo_con *  0.5, 3))
-                        else:
-                            cal_FuelEU_hfo_con.append(0.0)
+                        cal_FuelEU_hfo_con.append(0.0)
 
             cal_FuelEU_lfo_con = []
             for i in range(len(filtered_df_2)):
@@ -328,15 +402,18 @@ def display_filtered_data(*args):
                     prev_port = filtered_df_2.loc[i - 1, 'port']
                     cal_lfo_con = filtered_df_2.loc[i, 'cal_lfo_con']
 
-                    if curr_port == prev_port:
-                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3))
+                    elif prev_country == 'Non-EU' and curr_country == 'EU':
+                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3)) 
+                    elif prev_country == 'EU' and curr_country == 'Non-EU':
+                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3))
                     else:
-                        if curr_country == 'EU' and prev_country == 'EU':
-                            cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3))
-                        elif curr_country == 'EU' or prev_country == 'EU':
-                            cal_FuelEU_lfo_con.append(round(cal_lfo_con *  0.5, 3))
-                        else:
-                            cal_FuelEU_lfo_con.append(0.0)
+                        cal_FuelEU_lfo_con.append(0.0)
 
             cal_FuelEU_mgo_con = []
             for i in range(len(filtered_df_2)):
@@ -349,15 +426,18 @@ def display_filtered_data(*args):
                     prev_port = filtered_df_2.loc[i - 1, 'port']
                     cal_mgo_con = filtered_df_2.loc[i, 'cal_mgo_con']
 
-                    if curr_port == prev_port:
-                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3))
+                    elif prev_country == 'Non-EU' and curr_country == 'EU':
+                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3)) 
+                    elif prev_country == 'EU' and curr_country == 'Non-EU':
+                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3))
                     else:
-                        if curr_country == 'EU' and prev_country == 'EU':
-                            cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3))
-                        elif curr_country == 'EU' or prev_country == 'EU':
-                            cal_FuelEU_mgo_con.append(round(cal_mgo_con *  0.5, 3))
-                        else:
-                            cal_FuelEU_mgo_con.append(0.0)
+                        cal_FuelEU_mgo_con.append(0.0)
 
             cal_FuelEU_lng_con = []
             for i in range(len(filtered_df_2)):
@@ -370,15 +450,18 @@ def display_filtered_data(*args):
                     prev_port = filtered_df_2.loc[i - 1, 'port']
                     cal_lng_con = filtered_df_2.loc[i, 'cal_lng_con']
 
-                    if curr_port == prev_port:
-                        cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3) if curr_country == 'EU' else 0.0)
+                    if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                        cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                        cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3))
+                    elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                        cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3))
+                    elif prev_country == 'Non-EU' and curr_country == 'EU':
+                        cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3)) 
+                    elif prev_country == 'EU' and curr_country == 'Non-EU':
+                        cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3))
                     else:
-                        if curr_country == 'EU' and prev_country == 'EU':
-                            cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3))
-                        elif curr_country == 'EU' or prev_country == 'EU':
-                            cal_FuelEU_lng_con.append(round(cal_lng_con *  0.5, 3))
-                        else:
-                            cal_FuelEU_lng_con.append(0.0)
+                        cal_FuelEU_lng_con.append(0.0)
 
 
             filtered_df_2['EUAs'] = EUAs
@@ -390,7 +473,7 @@ def display_filtered_data(*args):
 
             print(f"\n Display 2: Cargo-Changing Legs Only (Excludes same cargo_mt AF–LL pairs):")
             display(filtered_df_2[[
-                'phase_end_date', 'phase', 'Country Code', 'port', 'cargo_mt',
+                'phase_end_date', 'phase', 'Country Code', 'OMR', 'port', 'cargo_mt',
                 'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
                 'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn',
                 'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con', 'cal_FuelEU_hfo_con',
