@@ -14,17 +14,272 @@ SUPABASE_DB_URL = os.getenv("SUPABASE_DB_URL") or "postgresql://postgres.gyzsjok
 st.set_page_config(
     page_title="Vessel EUAs & FuelEU Maritime Penalty Calculator",
     page_icon="🚢",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded" 
 )
 
-st.title("🚢 Vessel EUAs & FuelEU Maritime Penalty Calculator")
-st.markdown("---")
+st.markdown("""
+<style>
+    /* ===== COHESIVE COLOR PALETTE ===== */
+    :root {
+        --primary-color: #0052cc;
+        --primary-light: #0066ff;
+        --primary-dark: #003d99;
+        --secondary-color: #00d4ff;
+        --secondary-dark: #00a8cc;
+        --accent-color: #ff6b35;
+        --accent-light: #ff8c5a;
+        --success-color: #00d084;
+        --success-dark: #00a366;
+        --dark-bg: #0a0e27;
+        --card-bg: #1a1f3a;
+        --card-bg-light: #252d4a;
+        --card-bg-hover: #2d3555;
+        --text-primary: #e8eef7;
+        --text-secondary: #a0aac0;
+        --border-color: #2a3050;
+        --border-light: #3a4560;
+    }
+    
+    /* ===== GLOBAL STYLES ===== */
+    * {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    html, body {
+        background-color: var(--dark-bg) !important;
+    }
+    
+    [data-testid="stAppViewContainer"] {
+        background-color: var(--dark-bg) !important;
+    }
+    
+    [data-testid="stSidebar"] {
+        background-color: var(--card-bg) !important;
+    }
+    
+    [data-testid="stContainer"],
+    [data-testid="stDataFrame"],
+    .stDataFrame,
+    [data-testid="column"],
+    .element-container,
+    .stMarkdown {
+        background-color: transparent !important;
+        border: none !important;
+    }
+    
+    /* ===== MAIN HEADER ===== */
+    .main-header {
+        background: linear-gradient(135deg, #0052cc 0%, #0066ff 50%, #00d4ff 100%);
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 82, 204, 0.25);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        filter: blur(40px);
+    }
+    
+    .main-header h1 {
+        margin: 0;
+        font-size: 2.4rem;
+        font-weight: 800;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.5px;
+    }
+    
+    .main-header p {
+        margin: 0.5rem 0 0 0;
+        font-size: 1rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+        font-weight: 300;
+    }
+    
+    /* ===== METRIC CARDS ===== */
+    .metric-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 82, 204, 0.25);
+        transform: translateY(-2px);
+        border-color: var(--primary-light);
+    }
+    
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .metric-card.co2::before {
+        background: linear-gradient(90deg, #ff6b35, #ff8c5a);
+    }
+    
+    .metric-card.eua::before {
+        background: linear-gradient(90deg, #0052cc, #0066ff);
+    }
+    
+    .metric-card.ghg::before {
+        background: linear-gradient(90deg, #00d084, #00a366);
+    }
+    
+    .metric-card.penalty::before {
+        background: linear-gradient(90deg, #00d4ff, #00a8cc);
+    }
+    
+    .metric-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0.25rem 0;
+        letter-spacing: -0.5px;
+    }
+    
+    .metric-unit {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 1.5rem 0 1rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--primary-color);
+        display: inline-block;
+        letter-spacing: -0.3px;
+    }
+    
+    /* ===== SIDEBAR STYLING ===== */
+    .sidebar-section {
+        background: linear-gradient(135deg, #1a1f3a 0%, #151a2f 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 3px solid var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* ===== DATAFRAME STYLING ===== */
+    .dataframe-container {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    
+    /* ===== SUMMARY TABLE ===== */
+    .summary-table {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color);
+    }
+    
+    /* ===== BUTTON STYLING ===== */
+    .stButton > button {
+        background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 700;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 16px rgba(0, 82, 204, 0.3);
+        font-size: 0.95rem;
+        letter-spacing: 0.2px;
+    }
+    
+    .stButton > button:hover {
+        box-shadow: 0 8px 24px rgba(0, 82, 204, 0.4);
+        transform: translateY(-1px);
+    }
+    
+    /* ===== FOOTER ===== */
+    .footer {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        font-weight: 500;
+    }
+    
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+        .main-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+        }
+        
+        .section-header {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# --- Header Section ---
+st.markdown("""
+<div class="main-header">
+    <h1>🚢 Vessel EUAs & FuelEU Maritime Penalty Calculator</h1>
+    <p>Advanced emissions tracking and compliance analysis for maritime operations</p>
+</div>
+""", unsafe_allow_html=True)
 
 # --- Initialize session state for caching ---
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 
-@st.cache_data
 @st.cache_data
 def load_data():
     """Load data from database with caching"""
@@ -106,7 +361,7 @@ if df_vessel is not None:
     st.session_state.data_loaded = True
     
     # --- Sidebar Controls ---
-    st.sidebar.header("📊 Filter Options")
+    st.sidebar.markdown("### 📊 Filter Options")
     
     # Vessel selection
     vessel_options = sorted(df_vessel['vessel_name'].unique().tolist())
@@ -117,7 +372,7 @@ if df_vessel is not None:
     )
     
     # Date selection
-    st.sidebar.subheader("📅 Date Range")
+    st.sidebar.markdown("### 📅 Date Range")
     
     # Get min and max dates from data
     min_date = df_vessel['phase_end_date'].min().date()
@@ -133,11 +388,10 @@ if df_vessel is not None:
     to_date = st.sidebar.date_input(
         "To Date:",
         value=max_date,
-        min_value=from_date,  # Ensure to_date is not before from_date
+        min_value=from_date,
         max_value=max_date
     )
     
-    # --- Main Processing Function ---
     def process_vessel_data(vessel, from_date, to_date):
         """Process vessel data and calculate EUAs and penalties"""
         
@@ -185,10 +439,10 @@ if df_vessel is not None:
                     (df_vessel['vessel_name'] == vessel) &
                     (df_vessel['phase_end_date'] > prev_date) &
                     (df_vessel['phase_end_date'] <= curr_date)
-                ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
+                ][bdn_col].sum(min_count=1)
             
                 if pd.isna(bdn_sum):
-                    bdn_sum = 0  # default if no BDN found
+                    bdn_sum = 0
             
                 # Update BDN for current row
                 final_df.at[i, bdn_col] = bdn_sum
@@ -236,10 +490,10 @@ if df_vessel is not None:
                     (df_vessel['vessel_name'] == vessel) &
                     (df_vessel['phase_end_date'] > prev_date) &
                     (df_vessel['phase_end_date'] <= curr_date)
-                ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
+                ][bdn_col].sum(min_count=1)
             
                 if pd.isna(bdn_sum):
-                    bdn_sum = 0  # default if no BDN found
+                    bdn_sum = 0
             
                 # Update BDN for current row
                 filtered_df_2.at[i, bdn_col] = bdn_sum
@@ -260,34 +514,98 @@ if df_vessel is not None:
         ).round(3)
         
         # Map EU membership
-        df_country['port_code'] = df_country['country'].str[:2].str.upper()
-        eu_mapping = dict(zip(df_country['country_code'].str.upper(), df_country['EU_membership']))
-        
-        filtered_df_2['Country Code'] = (
-            filtered_df_2['port'].astype(str).str[:2].str.upper().map(eu_mapping).fillna('non-EU')
-        )
+        port_to_country = df_ports.set_index('Port Code')['EU Ports'].to_dict()
+        port_to_omr = df_ports.set_index('Port Code')['OMR'].to_dict()
+
+        filtered_df_2['Country Code'] = filtered_df_2['port'].map(port_to_country)
+        filtered_df_2['OMR'] = filtered_df_2['port'].map(port_to_omr)
         
         # Calculate EUAs
         EUAs = []
-        for i in range(len(filtered_df_2)):
-                if i == 0:
-                    EUAs.append(0.0)
-                else:
-                    curr_country = filtered_df_2.loc[i, 'Country Code']
-                    prev_country = filtered_df_2.loc[i - 1, 'Country Code']
-                    curr_port = filtered_df_2.loc[i, 'port']
-                    prev_port = filtered_df_2.loc[i - 1, 'port']
-                    carbon_emitted = filtered_df_2.loc[i, 'Carbon emitted']
 
-                    if curr_port == prev_port:
-                        EUAs.append(round(carbon_emitted * 0.7, 3) if curr_country == 'EU' else 0.0)
+        for i in range(len(filtered_df_2)):
+            if i == 0:
+                EUAs.append(0.0)
+                continue
+            
+            curr_country = filtered_df_2.loc[i, 'Country Code']
+            prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+            curr_port = filtered_df_2.loc[i, 'port']
+            prev_port = filtered_df_2.loc[i - 1, 'port']
+            curr_OMR = filtered_df_2.loc[i, 'OMR']
+            prev_OMR = filtered_df_2.loc[i - 1, 'OMR']
+            carbon_emitted = filtered_df_2.loc[i, 'Carbon emitted']
+            
+            # ---- Safe forward look ----
+            next_country = filtered_df_2.loc[i + 1, 'Country Code'] if i < len(filtered_df_2) - 1 else None
+            next_OMR = filtered_df_2.loc[i + 1, 'OMR'] if i < len(filtered_df_2) - 1 else None
+            
+            # ---- Safe backward look ----
+            two_back_prev_country = filtered_df_2.loc[i - 2, 'Country Code'] if i >= 2 else None
+            two_back_prev_OMR = filtered_df_2.loc[i - 2, 'OMR'] if i >= 2 else None
+            
+            # ---- Safe forward 2 look ----
+            two_fwd_next_country = filtered_df_2.loc[i + 2, 'Country Code'] if i < len(filtered_df_2) - 2 else None
+            two_fwd_next_OMR = filtered_df_2.loc[i + 2, 'OMR'] if i < len(filtered_df_2) - 2 else None
+            
+            # ===================================================================
+            #                  MAIN EUA LOGIC (corrected)
+            # ===================================================================
+            
+            # ---------- Case 1: Port Consumption ----------
+            if curr_port == prev_port:
+                if curr_country == 'EU' and two_back_prev_country == 'EU' and curr_OMR == 'No' and two_back_prev_OMR == 'Yes' :
+                    if curr_country[:2] == two_back_prev_country[:2] :
+                        EUAs.append(0.0)
                     else:
-                        if curr_country == 'EU' and prev_country == 'EU':
-                            EUAs.append(round(carbon_emitted * 0.7, 3))
-                        elif curr_country == 'EU' or prev_country == 'EU':
-                            EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
-                        else:
-                            EUAs.append(0.0)
+                        EUAs.append(round(carbon_emitted * 0.7, 3))
+            
+                elif curr_country == 'EU' and next_country == 'EU' and curr_OMR == 'No' and next_OMR == 'Yes' :
+                    if curr_country[:2] == next_country[:2]:
+                        EUAs.append(0.0)
+                    else:
+                        EUAs.append(round(carbon_emitted * 0.7, 3))
+
+                elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
+                    EUAs.append(0.0)
+
+                elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
+                    EUAs.append(0.0)
+
+                else:
+                    EUAs.append(round(carbon_emitted * 0.7, 3))
+            
+            # ---------- Case 2: Voyage consumption ----------
+            else:
+                # (1) Current EU+No and Previous EU+No → Full 70%
+                if curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                    EUAs.append(round(carbon_emitted * 0.7, 3))
+
+                elif curr_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'Yes' and curr_country[:2] == prev_country[:2]: #OMR to Mainland
+                    EUAs.append(0.0)
+                    
+            
+                # (2) Current EU+No OR Previous EU+No → 50%
+                elif curr_country == 'EU' and curr_OMR == 'No' and prev_country == 'Non-EU' :
+                    EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+                elif curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'No':
+                    EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+                elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
+                    EUAs.append(0.0)
+            
+                # (3) OMR to OMR voyage
+                elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
+                    if curr_country[:2] == prev_country[:2]:
+                        EUAs.append(0.0)
+                    else:
+                        EUAs.append(round(carbon_emitted * 0.7, 3))
+            
+                # (4) Mixed EU–NonEU + OMR transitions → half rate
+                elif (curr_country == 'EU' and prev_country == 'Non-EU' and curr_OMR == 'Yes') or (curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'Yes'):
+                    EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+            
+                else:
+                    EUAs.append(0.0)
 
 
         cal_FuelEU_hfo_con = []
@@ -300,16 +618,21 @@ if df_vessel is not None:
                 curr_port = filtered_df_2.loc[i, 'port']
                 prev_port = filtered_df_2.loc[i - 1, 'port']
                 cal_hfo_con = filtered_df_2.loc[i, 'cal_hfo_con']
+                curr_OMR = filtered_df_2.loc[i, 'OMR']
+                prev_OMR = filtered_df_2.loc[i-1, 'OMR']
 
-                if curr_port == prev_port:
-                    cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                    cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                    cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                    cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3))
+                elif prev_country == 'Non-EU' and curr_country == 'EU':
+                    cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3)) 
+                elif prev_country == 'EU' and curr_country == 'Non-EU':
+                    cal_FuelEU_hfo_con.append(round(cal_hfo_con * 0.5, 3))
                 else:
-                    if curr_country == 'EU' and prev_country == 'EU':
-                        cal_FuelEU_hfo_con.append(round(cal_hfo_con * 1, 3))
-                    elif curr_country == 'EU' or prev_country == 'EU':
-                        cal_FuelEU_hfo_con.append(round(cal_hfo_con *  0.5, 3))
-                    else:
-                        cal_FuelEU_hfo_con.append(0.0)
+                    cal_FuelEU_hfo_con.append(0.0)
 
         cal_FuelEU_lfo_con = []
         for i in range(len(filtered_df_2)):
@@ -321,16 +644,21 @@ if df_vessel is not None:
                 curr_port = filtered_df_2.loc[i, 'port']
                 prev_port = filtered_df_2.loc[i - 1, 'port']
                 cal_lfo_con = filtered_df_2.loc[i, 'cal_lfo_con']
+                curr_OMR = filtered_df_2.loc[i, 'OMR']
+                prev_OMR = filtered_df_2.loc[i-1, 'OMR']
 
-                if curr_port == prev_port:
-                    cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                    cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                    cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                    cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3))
+                elif prev_country == 'Non-EU' and curr_country == 'EU':
+                    cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3)) 
+                elif prev_country == 'EU' and curr_country == 'Non-EU':
+                    cal_FuelEU_lfo_con.append(round(cal_lfo_con * 0.5, 3))
                 else:
-                    if curr_country == 'EU' and prev_country == 'EU':
-                        cal_FuelEU_lfo_con.append(round(cal_lfo_con * 1, 3))
-                    elif curr_country == 'EU' or prev_country == 'EU':
-                        cal_FuelEU_lfo_con.append(round(cal_lfo_con *  0.5, 3))
-                    else:
-                        cal_FuelEU_lfo_con.append(0.0)
+                    cal_FuelEU_lfo_con.append(0.0)
 
         cal_FuelEU_mgo_con = []
         for i in range(len(filtered_df_2)):
@@ -342,16 +670,21 @@ if df_vessel is not None:
                 curr_port = filtered_df_2.loc[i, 'port']
                 prev_port = filtered_df_2.loc[i - 1, 'port']
                 cal_mgo_con = filtered_df_2.loc[i, 'cal_mgo_con']
+                curr_OMR = filtered_df_2.loc[i, 'OMR']
+                prev_OMR = filtered_df_2.loc[i-1, 'OMR']
 
-                if curr_port == prev_port:
-                    cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3) if curr_country == 'EU' else 0.0)
+                if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                    cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                    cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                    cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3))
+                elif prev_country == 'Non-EU' and curr_country == 'EU':
+                    cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3)) 
+                elif prev_country == 'EU' and curr_country == 'Non-EU':
+                    cal_FuelEU_mgo_con.append(round(cal_mgo_con * 0.5, 3))
                 else:
-                    if curr_country == 'EU' and prev_country == 'EU':
-                        cal_FuelEU_mgo_con.append(round(cal_mgo_con * 1, 3))
-                    elif curr_country == 'EU' or prev_country == 'EU':
-                        cal_FuelEU_mgo_con.append(round(cal_mgo_con *  0.5, 3))
-                    else:
-                        cal_FuelEU_mgo_con.append(0.0)
+                    cal_FuelEU_mgo_con.append(0.0)
 
         cal_FuelEU_lng_con = []
         for i in range(len(filtered_df_2)):
@@ -363,16 +696,21 @@ if df_vessel is not None:
                 curr_port = filtered_df_2.loc[i, 'port']
                 prev_port = filtered_df_2.loc[i - 1, 'port']
                 cal_lng_con = filtered_df_2.loc[i, 'cal_lng_con']
+                curr_OMR = filtered_df_2.loc[i, 'OMR']
+                prev_OMR = filtered_df_2.loc[i-1, 'OMR']
 
-                if curr_port == prev_port:
-                    cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3) if curr_country == 'EU' else 0.0)
+                if  curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                    cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'Yes' and prev_OMR == 'No':
+                    cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3))
+                elif curr_country == 'EU' and prev_country == 'EU' and  curr_OMR == 'No' and prev_OMR == 'Yes':
+                    cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3))
+                elif prev_country == 'Non-EU' and curr_country == 'EU':
+                    cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3)) 
+                elif prev_country == 'EU' and curr_country == 'Non-EU':
+                    cal_FuelEU_lng_con.append(round(cal_lng_con * 0.5, 3))
                 else:
-                    if curr_country == 'EU' and prev_country == 'EU':
-                        cal_FuelEU_lng_con.append(round(cal_lng_con * 1, 3))
-                    elif curr_country == 'EU' or prev_country == 'EU':
-                        cal_FuelEU_lng_con.append(round(cal_lng_con *  0.5, 3))
-                    else:
-                        cal_FuelEU_lng_con.append(0.0)
+                    cal_FuelEU_lng_con.append(0.0)
 
 
         filtered_df_2['EUAs'] = EUAs
@@ -479,45 +817,51 @@ if df_vessel is not None:
                     filtered_df = eua_summary = fueleu_summary = None
             
             if filtered_df is not None and len(filtered_df) > 0:
-                # Display key metrics at the top
+                st.markdown("<h2 class='section-header'>📊 Key Performance Indicators</h2>", unsafe_allow_html=True)
+                
                 col1, col2, col3, col4 = st.columns(4)
                 
                 with col1:
-                    st.metric(
-                        "Total CO₂ Emitted", 
-                        f"{eua_summary['CO₂ Emitted (mt)'].iloc[0]} mt",
-                        help="Total carbon dioxide emissions in metric tonnes"
-                    )
+                    st.markdown(f"""
+                    <div class="metric-card co2">
+                        <span class="metric-label">CO₂ Emissions</span>
+                        <div class="metric-value">{eua_summary['CO₂ Emitted (mt)'].iloc[0]}</div>
+                        <span class="metric-unit">metric tonnes</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
                 with col2:
-                    st.metric(
-                        "EUAs Required", 
-                        f"{eua_summary['EUAs'].iloc[0]}",
-                        help="European Union Allowances required"
-                    )
+                    st.markdown(f"""
+                    <div class="metric-card eua">
+                        <span class="metric-label">EUAs Required</span>
+                        <div class="metric-value">{eua_summary['EUAs'].iloc[0]}</div>
+                        <span class="metric-unit">allowances</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
                 with col3:
-                    st.metric(
-                        "GHG Intensity", 
-                        f"{fueleu_summary['GHG_Ints_Act'].iloc[0]} g CO₂eq/MJ",
-                        help="Actual greenhouse gas intensity"
-                    )
+                    st.markdown(f"""
+                    <div class="metric-card ghg">
+                        <span class="metric-label">GHG Intensity</span>
+                        <div class="metric-value">{fueleu_summary['GHG_Ints_Act'].iloc[0]}</div>
+                        <span class="metric-unit">g CO₂eq/MJ</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
                 with col4:
                     penalty_value = fueleu_summary['Penalty (EUR)'].iloc[0]
-                    st.metric(
-                        "FuelEU Penalty", 
-                        f"€{penalty_value:,.2f}",
-                        help="FuelEU Maritime penalty in EUR"
-                    )
+                    st.markdown(f"""
+                    <div class="metric-card penalty">
+                        <span class="metric-label">FuelEU Penalty</span>
+                        <div class="metric-value">€{penalty_value:,.0f}</div>
+                        <span class="metric-unit">EUR</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
-                st.markdown("---")
-                
-                # Display detailed data
-                st.subheader("📋 Detailed Voyage Data")
+                st.markdown("<h2 class='section-header'>📋 Detailed Voyage Data</h2>", unsafe_allow_html=True)
                 
                 display_columns = [
-                    'phase_end_date', 'phase', 'Country Code', 'port', 'cargo_mt',
+                    'phase_end_date', 'phase', 'Country Code', 'OMR', 'port', 'cargo_mt',
                     'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
                     'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn',
                     'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con',
@@ -530,19 +874,21 @@ if df_vessel is not None:
                     hide_index=True
                 )
                 
-                # Display summary tables
+                st.markdown("<h2 class='section-header'>📊 Summary Analysis</h2>", unsafe_allow_html=True)
+                
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.subheader("🌍 EUA Calculation Summary")
+                    st.markdown("<h3 style='font-size: 1.1rem; color: var(--text-primary); margin: 0 0 1rem 0;'>🌍 EUA Calculation</h3>", unsafe_allow_html=True)
                     st.dataframe(eua_summary, use_container_width=True, hide_index=True)
                 
                 with col2:
-                    st.subheader("⛽ FuelEU Maritime Summary")
+                    st.markdown("<h3 style='font-size: 1.1rem; color: var(--text-primary); margin: 0 0 1rem 0;'>⛽ FuelEU Maritime</h3>", unsafe_allow_html=True)
                     st.dataframe(fueleu_summary, use_container_width=True, hide_index=True)
                 
-                # Save to database button
-                if st.button("💾 Save Results to Database", type="primary"):
+                st.markdown("<h2 class='section-header'>💾 Export Results</h2>", unsafe_allow_html=True)
+                
+                if st.button("Save Results to Database", type="primary", use_container_width=False):
                     try:
                         engine = get_database_engine()
                         
@@ -595,15 +941,8 @@ else:
     st.info("Make sure your SUPABASE_DB_URL environment variable is correctly set.")
 
 # --- Footer ---
-st.markdown("---")
-st.markdown(
-    """
-    <div style='text-align: center; color: #666; font-size: 0.8em;'>
-    🚢 Vessel EUAs & FuelEU Maritime Penalty Calculator | 
-    Built with Streamlit
-    </div>
-    """, 
-    unsafe_allow_html=True
-)
-
-
+st.markdown("""
+<div class='footer'>
+    🚢 Vessel EUAs & FuelEU Maritime Penalty Calculator | Built with Streamlit
+</div>
+""", unsafe_allow_html=True)
