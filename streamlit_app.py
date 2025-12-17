@@ -99,172 +99,191 @@ st.markdown("""
         font-weight: 800;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         position: relative;
-        z-index: 1;
-        letter-spacing: -0.5px;
     }
     
     .main-header p {
         margin: 0.5rem 0 0 0;
-        font-size: 1rem;
+        font-size: 1.1rem;
         opacity: 0.95;
         position: relative;
-        z-index: 1;
-        font-weight: 300;
     }
     
-    /* ===== METRIC CARDS ===== */
-    .metric-card {
+    /* ===== CARDS & CONTAINERS ===== */
+    .info-card {
         background: var(--card-bg);
         border-radius: 12px;
         padding: 1.5rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         border: 1px solid var(--border-color);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
     }
     
-    .metric-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 82, 204, 0.25);
+    .info-card:hover {
+        background: var(--card-bg-hover);
+        border-color: var(--primary-color);
+        box-shadow: 0 6px 20px rgba(0, 82, 204, 0.3);
         transform: translateY(-2px);
-        border-color: var(--primary-light);
     }
     
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    }
-    
-    .metric-card.co2::before {
-        background: linear-gradient(90deg, #ff6b35, #ff8c5a);
-    }
-    
-    .metric-card.eua::before {
-        background: linear-gradient(90deg, #0052cc, #0066ff);
-    }
-    
-    .metric-card.ghg::before {
-        background: linear-gradient(90deg, #00d084, #00a366);
-    }
-    
-    .metric-card.penalty::before {
-        background: linear-gradient(90deg, #00d4ff, #00a8cc);
-    }
-    
-    .metric-label {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
+    .info-card h3 {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
         font-weight: 700;
+        margin: 0 0 0.5rem 0;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 0.5rem;
-        display: block;
+        letter-spacing: 0.5px;
     }
     
-    .metric-value {
+    .info-card p {
+        color: var(--text-primary);
         font-size: 2rem;
         font-weight: 800;
-        color: var(--text-primary);
-        margin: 0.25rem 0;
-        letter-spacing: -0.5px;
+        margin: 0;
     }
     
-    .metric-unit {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-    }
-    
-    /* ===== SECTION HEADERS ===== */
-    .section-header {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: var(--text-primary);
-        margin: 1.5rem 0 1rem 0;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid var(--primary-color);
-        display: inline-block;
-        letter-spacing: -0.3px;
-    }
-    
-    /* ===== SIDEBAR STYLING ===== */
+    /* ===== SIDEBAR FILTERS ===== */
     .sidebar-section {
-        background: linear-gradient(135deg, #1a1f3a 0%, #151a2f 100%);
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        border-left: 3px solid var(--primary-color);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* ===== DATAFRAME STYLING ===== */
-    .dataframe-container {
-        background: var(--card-bg);
-        border-radius: 12px;
+        background: var(--card-bg-light);
         padding: 1.25rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        border: 1px solid var(--border-color);
-        overflow-x: auto;
-        margin: 1rem 0;
-    }
-    
-    /* ===== SUMMARY TABLE ===== */
-    .summary-table {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
         border: 1px solid var(--border-color);
     }
     
-    /* ===== BUTTON STYLING ===== */
+    .sidebar-section h3 {
+        color: var(--primary-light);
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* ===== BUTTONS ===== */
     .stButton > button {
-        background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
         color: white;
         border: none;
-        border-radius: 8px;
         padding: 0.75rem 2rem;
-        font-weight: 700;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 16px rgba(0, 82, 204, 0.3);
-        font-size: 0.95rem;
-        letter-spacing: 0.2px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
     }
     
     .stButton > button:hover {
-        box-shadow: 0 8px 24px rgba(0, 82, 204, 0.4);
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4);
+        transform: translateY(-2px);
     }
     
-    /* ===== FOOTER ===== */
-    .footer {
-        text-align: center;
-        color: var(--text-secondary);
+    /* ===== DATAFRAME STYLING ===== */
+    .dataframe {
+        background-color: var(--card-bg) !important;
+        border-radius: 8px;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    .dataframe thead th {
+        background-color: var(--primary-dark) !important;
+        color: white !important;
+        font-weight: 700;
+        text-transform: uppercase;
         font-size: 0.85rem;
-        margin-top: 3rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--border-color);
-        font-weight: 500;
+        padding: 0.75rem !important;
+        border: none !important;
     }
     
-    /* ===== RESPONSIVE DESIGN ===== */
-    @media (max-width: 768px) {
-        .main-header h1 {
-            font-size: 1.8rem;
-        }
-        
-        .metric-value {
-            font-size: 1.5rem;
-        }
-        
-        .section-header {
-            font-size: 1.1rem;
-        }
+    .dataframe tbody tr {
+        background-color: var(--card-bg) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        transition: all 0.2s ease;
+    }
+    
+    .dataframe tbody tr:hover {
+        background-color: var(--card-bg-hover) !important;
+    }
+    
+    .dataframe tbody td {
+        color: var(--text-primary) !important;
+        padding: 0.75rem !important;
+        border: none !important;
+    }
+    
+    /* ===== TABS ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: var(--card-bg);
+        padding: 0.5rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent;
+        color: var(--text-secondary);
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        background-color: var(--card-bg-light);
+        color: var(--primary-light);
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
+    }
+    
+    /* ===== INPUT FIELDS ===== */
+    .stSelectbox label, .stDateInput label, .stTextInput label {
+        color: var(--text-secondary) !important;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stSelectbox > div > div, .stDateInput > div > div, .stTextInput > div > div {
+        background-color: var(--card-bg-light);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+    }
+    
+    .stSelectbox > div > div:hover, .stDateInput > div > div:hover, .stTextInput > div > div:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 1px var(--primary-color);
+    }
+    
+    /* ===== ALERTS ===== */
+    .stAlert {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+    }
+    
+    /* ===== METRICS ===== */
+    [data-testid="stMetricValue"] {
+        color: var(--text-primary);
+        font-size: 2rem;
+        font-weight: 800;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -283,7 +302,7 @@ if 'data_loaded' not in st.session_state:
 
 @st.cache_data
 def load_data():
-    """Load data from database with caching"""
+    """Load data from database with caching and proper type conversions"""
     try:
         engine = create_engine(SUPABASE_DB_URL)
         
@@ -293,6 +312,16 @@ def load_data():
         df_country = pd.read_sql("SELECT * FROM \"country_code_list\"", con=engine)
         df_vessel_type = pd.read_sql("SELECT vessel_name, vessel_type FROM vessels_type_list", con=engine)
 
+        numeric_columns = [
+            'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
+            'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn',
+            'cargo_mt'
+        ]
+        
+        for col in numeric_columns:
+            if col in df_vessel.columns:
+                df_vessel[col] = pd.to_numeric(df_vessel[col], errors='coerce').fillna(0)
+        
         # Normalize
         df_vessel_type['vessel_name'] = df_vessel_type['vessel_name'].str.strip()
         df_vessel_type['vessel_type'] = df_vessel_type['vessel_type'].str.strip().str.upper()
@@ -349,688 +378,581 @@ def load_data():
         
         engine.dispose()
         return df_vessel, df_ports, df_country, df_vessel_type
-
+        
     except Exception as e:
         st.error(f"Error loading data: {str(e)}")
+        st.error("Please check your database connection and ensure SUPABASE_DB_URL is set correctly.")
         return None, None, None, None
-
 
 def get_database_engine():
     """Create database engine for operations"""
     return create_engine(SUPABASE_DB_URL)
 
 # Load data
-with st.spinner("Loading vessel data..."):
+try:
     df_vessel, df_ports, df_country, df_vessel_type = load_data()
-
-if df_vessel is not None:
+    
+    if df_vessel is None:
+        st.stop()
+        
     st.session_state.data_loaded = True
-    
-    # --- Sidebar Controls ---
-    st.sidebar.markdown("### 📊 Filter Options")
-    
-    # Vessel selection
-    vessel_options = sorted(df_vessel['vessel_name'].unique().tolist())
-    selected_vessel = st.sidebar.selectbox(
-        "Select Vessel:",
-        vessel_options,
-        index=0 if vessel_options else None
-    )
+except Exception as e:
+    st.error(f"Failed to load data: {str(e)}")
+    st.stop()
 
-    # --- Backend-only vessel type lookup ---
-    vessel_type_row = df_vessel_type.loc[
-        df_vessel_type['vessel_name'] == selected_vessel, 
-        'vessel_type'
-    ]
+# Get unique vessel names
+vessel_names = sorted(df_vessel['vessel_name'].unique().tolist())
 
-    vessel_type = vessel_type_row.iloc[0] if not vessel_type_row.empty else None
-
+# --- Sidebar Filters ---
+with st.sidebar:
+    st.markdown('<div class="sidebar-section"><h3>📊 Filter Options</h3>', unsafe_allow_html=True)
     
-    # Date selection
-    st.sidebar.markdown("### 📅 Date Range")
-    
-    # Get min and max dates from data
-    min_date = df_vessel['phase_end_date'].min().date()
-    max_date = df_vessel['phase_end_date'].max().date()
-    
-    from_date = st.sidebar.date_input(
-        "From Date:",
-        value=min_date,
-        min_value=min_date,
-        max_value=max_date
+    st.markdown("### Select Vessel:")
+    selected_vessel = st.selectbox(
+        "Choose a vessel",
+        options=vessel_names,
+        index=0 if vessel_names else None,
+        label_visibility="collapsed"
     )
     
-    to_date = st.sidebar.date_input(
-        "To Date:",
-        value=max_date,
-        min_value=from_date,
-        max_value=max_date
-    )
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    def process_vessel_data(vessel, from_date, to_date):
-        """Process vessel data and calculate EUAs and penalties"""
-        
-        if not vessel or not from_date or not to_date:
-            return None, None, None
-            
-        # Filter data
-        mask = (
-            (df_vessel['vessel_name'] == vessel) &
-            (df_vessel['phase_end_date'].dt.date >= from_date) &
-            (df_vessel['phase_end_date'].dt.date <= to_date) &
-            (df_vessel['phase'].str.upper().isin(['ALL FAST', 'LAST LINE']))
+    st.markdown('<div class="sidebar-section"><h3>📅 Date Range</h3>', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**From Date:**")
+        from_date = st.date_input(
+            "From",
+            value=date(2024, 12, 30),
+            label_visibility="collapsed"
         )
-        
-        final_df = df_vessel[mask].copy()
-        
-        if len(final_df) == 0:
-            return None, None, None
-            
-        final_df['port'] = final_df['start_port']
-        final_df = final_df.sort_values(by='phase_end_date').reset_index(drop=True)
-        
-        # Remove duplicates
-        final_df = final_df.drop_duplicates(subset=[
-            'phase_end_date', 'phase', 'start_port', 'end_port',
-            'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
-            'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn'
-        ], keep='first').reset_index(drop=True)
-        
-        # Calculate fuel consumption
-        for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
-            rob_col = f'{fuel}_rob'
-            bdn_col = f'{fuel}_bdn'
-            calc_col = f'cal_{fuel}_con'
-            
-            # initialize consumption
-            final_df[calc_col] = None  
-            
-            for i in range(1, len(final_df)):
-                prev_date = final_df.at[i-1, 'phase_end_date']
-                curr_date = final_df.at[i, 'phase_end_date']
-            
-                # Sum BDN values between (prev_date, curr_date]
-                bdn_sum = df_vessel[
-                    (df_vessel['vessel_name'] == vessel) &
-                    (df_vessel['phase_end_date'] > prev_date) &
-                    (df_vessel['phase_end_date'] <= curr_date)
-                ][bdn_col].sum(min_count=1)
-            
-                if pd.isna(bdn_sum):
-                    bdn_sum = 0
-            
-                # Update BDN for current row
-                final_df.at[i, bdn_col] = bdn_sum
-            
-                # Calculate consumption
-                final_df.at[i, calc_col] = (
-                    final_df.at[i-1, rob_col] + 
-                    final_df.at[i, bdn_col] - 
-                    final_df.at[i, rob_col]
-                )
-        
-        # Remove cargo-matching AF-LL pairs
-        rows_to_remove = []
+    
+    with col2:
+        st.markdown("**To Date:**")
+        to_date = st.date_input(
+            "To",
+            value=date(2025, 12, 17),
+            label_visibility="collapsed"
+        )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        if vessel_type and 'container' in vessel_type.lower():
-            # mark MAPTM and EGPSE rows for removal
-            for i in range(len(final_df)):
-                if final_df.at[i, 'port'] in ['MAPTM', 'EGPSE']:
-                    rows_to_remove.append(i)
-            
-        i = 0
-        while i < len(final_df) - 1:
-            row_af = final_df.iloc[i]
-            row_ll = final_df.iloc[i + 1]
-            if row_af['phase'] == 'ALL FAST' and row_ll['phase'] == 'LAST LINE':
-                if row_af['cargo_mt'] == row_ll['cargo_mt']:
-                    rows_to_remove.extend([i, i + 1])
-                i += 2
+# --- Main Processing Function ---
+@st.cache_data
+def process_vessel_data(vessel, from_date, to_date):
+    """Process vessel data and calculate EUAs and penalties with proper type handling"""
+    
+    if not vessel or not from_date or not to_date:
+        return None, None, None
+        
+    # Filter data
+    mask = (
+        (df_vessel['vessel_name'] == vessel) &
+        (df_vessel['phase_end_date'].dt.date >= from_date) &
+        (df_vessel['phase_end_date'].dt.date <= to_date) &
+        (df_vessel['phase'].str.upper().isin(['ALL FAST', 'LAST LINE']))
+    )
+    
+    final_df = df_vessel[mask].copy()
+    
+    if len(final_df) == 0:
+        return None, None, None
+        
+    final_df['port'] = final_df['start_port']
+    final_df = final_df.sort_values(by='phase_end_date').reset_index(drop=True)
+    
+    numeric_cols = ['hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob', 
+                   'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn', 'cargo_mt']
+    for col in numeric_cols:
+        if col in final_df.columns:
+            final_df[col] = pd.to_numeric(final_df[col], errors='coerce').fillna(0).astype('float64')
+    
+    # Remove duplicates
+    final_df = final_df.drop_duplicates(subset=[
+        'phase_end_date', 'phase', 'start_port', 'end_port',
+        'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
+        'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn'
+    ], keep='first').reset_index(drop=True)
+    
+    # Calculate fuel consumption
+    for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
+        rob_col = f'{fuel}_rob'
+        bdn_col = f'{fuel}_bdn'
+        calc_col = f'cal_{fuel}_con'
+        
+        # initialize consumption with float64
+        final_df[calc_col] = np.nan
+        final_df[calc_col] = final_df[calc_col].astype('float64')
+        
+        for i in range(1, len(final_df)):
+            prev_date = final_df.at[i-1, 'phase_end_date']
+            curr_date = final_df.at[i, 'phase_end_date']
+        
+            # Sum BDN values between (prev_date, curr_date]
+            bdn_sum = df_vessel[
+                (df_vessel['vessel_name'] == vessel) &
+                (df_vessel['phase_end_date'] > prev_date) &
+                (df_vessel['phase_end_date'] <= curr_date)
+            ][bdn_col].sum(min_count=1)
+        
+            if pd.isna(bdn_sum):
+                bdn_sum = 0.0
             else:
-                i += 1
-
-
-
-#-----------------------------Display 1 making completed and going forward to make display 2 -----------------------------------------------------
-            
-        filtered_df_2 = final_df.drop(index=rows_to_remove).reset_index(drop=True)
-            
-
-
-
-#---------------------------------Placing the Bunker values properly (For Display 2) -----------------------------------------------------------
-
-        for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
-            rob_col = f'{fuel}_rob'
-            bdn_col = f'{fuel}_bdn'
-            calc_col = f'cal_{fuel}_con'
-
-            # initialize consumption
-            filtered_df_2[calc_col] = None  
+                bdn_sum = float(bdn_sum)
         
-            for i in range(1, len(filtered_df_2)):
-                prev_date = filtered_df_2.at[i-1, 'phase_end_date']
-                curr_date = filtered_df_2.at[i, 'phase_end_date']
+            # Update BDN for current row
+            final_df.at[i, bdn_col] = bdn_sum
         
-                # Sum BDN values between (prev_date, curr_date]
-                bdn_sum = df_vessel[
-                    (df_vessel['vessel_name'] == vessel) &
-                    (df_vessel['phase_end_date'] > prev_date) &
-                    (df_vessel['phase_end_date'] <= curr_date)
-                ][bdn_col].sum(min_count=1)  # min_count=1 ensures NaN if nothing found
-        
-                if pd.isna(bdn_sum):
-                    bdn_sum = 0  # default if no BDN found
-        
-                # Update BDN for current row
-                filtered_df_2.at[i, bdn_col] = bdn_sum
-        
-                # Calculate consumption
-                filtered_df_2.at[i, calc_col] = (
-                    filtered_df_2.at[i-1, rob_col] + 
-                    filtered_df_2.at[i, bdn_col] - 
-                    filtered_df_2.at[i, rob_col]
-                )
+            # Calculate consumption with explicit float conversion
+            prev_rob = float(final_df.at[i-1, rob_col])
+            curr_rob = float(final_df.at[i, rob_col])
+            final_df.at[i, calc_col] = prev_rob + bdn_sum - curr_rob
+    
+    # Get vessel type
+    vessel_type_match = df_vessel_type[df_vessel_type['vessel_name'] == vessel]
+    vessel_type = vessel_type_match['vessel_type'].iloc[0] if not vessel_type_match.empty else None
+    
+    # Remove cargo-matching AF-LL pairs
+    rows_to_remove = []
 
-#------------------------------------------------------------------------------------------------------------------------------------------------
-        port_to_country = df_ports.set_index('Port Code')['EU Ports'].to_dict()
-        port_to_omr = df_ports.set_index('Port Code')['OMR'].to_dict()
-
-        filtered_df_2['Country Code'] = filtered_df_2['port'].map(port_to_country)
-        filtered_df_2['OMR'] = filtered_df_2['port'].map(port_to_omr)
+    if vessel_type and 'container' in vessel_type.lower():
+        # mark MAPTM and EGPSE rows for removal
+        for i in range(len(final_df)):
+            if final_df.at[i, 'port'] in ['MAPTM', 'EGPSE']:
+                rows_to_remove.append(i)
         
-        filtered_df_2['Carbon emitted'] = (
-            filtered_df_2['cal_hfo_con'].fillna(0) * 3.114 +
-            filtered_df_2['cal_lfo_con'].fillna(0) * 3.151 +
-            filtered_df_2['cal_mgo_con'].fillna(0) * 3.206 +
-            filtered_df_2['cal_lng_con'].fillna(0) * 2.75
-        ).round(3)
+    i = 0
+    while i < len(final_df) - 1:
+        row_af = final_df.iloc[i]
+        row_ll = final_df.iloc[i + 1]
+        if row_af['phase'] == 'ALL FAST' and row_ll['phase'] == 'LAST LINE':
+            if row_af['cargo_mt'] == row_ll['cargo_mt']:
+                rows_to_remove.extend([i, i + 1])
+            i += 2
+        else:
+            i += 1
 
-        
-        EUAs = []
+    filtered_df_2 = final_df.drop(index=rows_to_remove).reset_index(drop=True)
 
-        for i in range(len(filtered_df_2)):
-            if i == 0:
+    for col in numeric_cols:
+        if col in filtered_df_2.columns:
+            filtered_df_2[col] = pd.to_numeric(filtered_df_2[col], errors='coerce').fillna(0).astype('float64')
+
+    # Recalculate bunker values for Display 2
+    for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
+        rob_col = f'{fuel}_rob'
+        bdn_col = f'{fuel}_bdn'
+        calc_col = f'cal_{fuel}_con'
+
+        # initialize consumption with float64
+        filtered_df_2[calc_col] = np.nan
+        filtered_df_2[calc_col] = filtered_df_2[calc_col].astype('float64')
+    
+        for i in range(1, len(filtered_df_2)):
+            prev_date = filtered_df_2.at[i-1, 'phase_end_date']
+            curr_date = filtered_df_2.at[i, 'phase_end_date']
+    
+            # Sum BDN values between (prev_date, curr_date]
+            bdn_sum = df_vessel[
+                (df_vessel['vessel_name'] == vessel) &
+                (df_vessel['phase_end_date'] > prev_date) &
+                (df_vessel['phase_end_date'] <= curr_date)
+            ][bdn_col].sum(min_count=1)
+    
+            if pd.isna(bdn_sum):
+                bdn_sum = 0.0
+            else:
+                bdn_sum = float(bdn_sum)
+    
+            # Update BDN for current row
+            filtered_df_2.at[i, bdn_col] = bdn_sum
+    
+            # Calculate consumption with explicit float conversion
+            prev_rob = float(filtered_df_2.at[i-1, rob_col])
+            curr_rob = float(filtered_df_2.at[i, rob_col])
+            filtered_df_2.at[i, calc_col] = prev_rob + bdn_sum - curr_rob
+
+    port_to_country = df_ports.set_index('Port Code')['EU Ports'].to_dict()
+    port_to_omr = df_ports.set_index('Port Code')['OMR'].to_dict()
+
+    filtered_df_2['Country Code'] = filtered_df_2['port'].map(port_to_country)
+    filtered_df_2['OMR'] = filtered_df_2['port'].map(port_to_omr)
+    
+    filtered_df_2['Carbon emitted'] = (
+        filtered_df_2['cal_hfo_con'].fillna(0.0).astype('float64') * 3.114 +
+        filtered_df_2['cal_lfo_con'].fillna(0.0).astype('float64') * 3.151 +
+        filtered_df_2['cal_mgo_con'].fillna(0.0).astype('float64') * 3.206 +
+        filtered_df_2['cal_lng_con'].fillna(0.0).astype('float64') * 2.75
+    ).round(3)
+
+    
+    EUAs = []
+
+    for i in range(len(filtered_df_2)):
+        if i == 0:
+            EUAs.append(0.0)
+            continue
+    
+        curr_country = filtered_df_2.loc[i, 'Country Code']
+        prev_country = filtered_df_2.loc[i - 1, 'Country Code']
+        curr_port = filtered_df_2.loc[i, 'port']
+        prev_port = filtered_df_2.loc[i - 1, 'port']
+        curr_OMR = filtered_df_2.loc[i, 'OMR']
+        prev_OMR = filtered_df_2.loc[i - 1, 'OMR']
+        carbon_emitted = float(filtered_df_2.loc[i, 'Carbon emitted'])
+    
+        # ---- Safe forward look ----
+        next_country = filtered_df_2.loc[i + 1, 'Country Code'] if i < len(filtered_df_2) - 1 else None
+        next_OMR = filtered_df_2.loc[i + 1, 'OMR'] if i < len(filtered_df_2) - 1 else None
+    
+        # ---- Safe backward look ----
+        two_back_prev_country = filtered_df_2.loc[i - 2, 'Country Code'] if i >= 2 else None
+        two_back_prev_OMR = filtered_df_2.loc[i - 2, 'OMR'] if i >= 2 else None
+    
+        # ---- Safe forward 2 look ----
+        two_fwd_next_country = filtered_df_2.loc[i + 2, 'Country Code'] if i < len(filtered_df_2) - 2 else None
+        two_fwd_next_OMR = filtered_df_2.loc[i + 2, 'OMR'] if i < len(filtered_df_2) - 2 else None
+    
+        # ===================================================================
+        #                         MAIN EUA LOGIC 
+        # ===================================================================
+    
+        # ---------- Case 1: Port Consumption ----------
+        if curr_port == prev_port:
+            if curr_country == 'EU' and two_back_prev_country == 'EU' and curr_OMR == 'No' and two_back_prev_OMR == 'Yes' :
+                if curr_country[:2] == two_back_prev_country[:2] :
+                    EUAs.append(0.0)
+                else:
+                    EUAs.append(round(carbon_emitted * 0.7, 3))
+    
+            elif curr_country == 'EU' and next_country == 'EU' and curr_OMR == 'No' and next_OMR == 'Yes' :
+                if curr_country[:2] == next_country[:2]:
+                    EUAs.append(0.0)
+                else:
+                    EUAs.append(round(carbon_emitted * 0.7, 3))
+
+            elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
                 EUAs.append(0.0)
-                continue
-        
-            curr_country = filtered_df_2.loc[i, 'Country Code']
-            prev_country = filtered_df_2.loc[i - 1, 'Country Code']
-            curr_port = filtered_df_2.loc[i, 'port']
-            prev_port = filtered_df_2.loc[i - 1, 'port']
-            curr_OMR = filtered_df_2.loc[i, 'OMR']
-            prev_OMR = filtered_df_2.loc[i - 1, 'OMR']
-            carbon_emitted = filtered_df_2.loc[i, 'Carbon emitted']
-        
-            # ---- Safe forward look ----
-            next_country = filtered_df_2.loc[i + 1, 'Country Code'] if i < len(filtered_df_2) - 1 else None
-            next_OMR = filtered_df_2.loc[i + 1, 'OMR'] if i < len(filtered_df_2) - 1 else None
-        
-            # ---- Safe backward look ----
-            two_back_prev_country = filtered_df_2.loc[i - 2, 'Country Code'] if i >= 2 else None
-            two_back_prev_OMR = filtered_df_2.loc[i - 2, 'OMR'] if i >= 2 else None
-        
-            # ---- Safe forward 2 look ----
-            two_fwd_next_country = filtered_df_2.loc[i + 2, 'Country Code'] if i < len(filtered_df_2) - 2 else None
-            two_fwd_next_OMR = filtered_df_2.loc[i + 2, 'OMR'] if i < len(filtered_df_2) - 2 else None
-        
-            # ===================================================================
-            #                         MAIN EUA LOGIC 
-            # ===================================================================
-        
-            # ---------- Case 1: Port Consumption ----------
-            if curr_port == prev_port:
-                if curr_country == 'EU' and two_back_prev_country == 'EU' and curr_OMR == 'No' and two_back_prev_OMR == 'Yes' :
-                    if curr_country[:2] == two_back_prev_country[:2] :
-                        EUAs.append(0.0)
-                    else:
-                        EUAs.append(round(carbon_emitted * 0.7, 3))
-        
-                elif curr_country == 'EU' and next_country == 'EU' and curr_OMR == 'No' and next_OMR == 'Yes' :
-                    if curr_country[:2] == next_country[:2]:
-                        EUAs.append(0.0)
-                    else:
-                        EUAs.append(round(carbon_emitted * 0.7, 3))
 
-                elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
+            elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
+                EUAs.append(0.0)
+
+            else:
+                EUAs.append(round(carbon_emitted * 0.7, 3))
+    
+        # ---------- Case 2: Voyage consumption ----------
+        else:
+            # (1) Current EU+No and Previous EU+No → Full 70%
+            if curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
+                EUAs.append(round(carbon_emitted * 0.7, 3))
+
+            elif curr_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'Yes' and curr_country[:2] == prev_country[:2]:
+                EUAs.append(0.0)
+            
+    
+            # (2) Current EU+No OR Previous EU+No → 50%
+            elif curr_country == 'EU' and curr_OMR == 'No' and prev_country == 'Non-EU' :
+                EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+            elif curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'No':
+                EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
+            elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
+                EUAs.append(0.0)
+    
+            # (3) OMR to OMR voyage
+            elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
+                if curr_country[:2] == prev_country[:2]:
                     EUAs.append(0.0)
-
-                elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
-                    EUAs.append(0.0)
-
                 else:
                     EUAs.append(round(carbon_emitted * 0.7, 3))
-        
-            # ---------- Case 2: Voyage consumption ----------
-            else:
-                # (1) Current EU+No and Previous EU+No → Full 70%
-                if curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'No':
-                    EUAs.append(round(carbon_emitted * 0.7, 3))
-
-                elif curr_country == 'EU' and curr_OMR == 'No' and prev_OMR == 'Yes' and curr_country[:2] == prev_country[:2]: #OMR to Mainland
-                    EUAs.append(0.0)
-                
-        
-                # (2) Current EU+No OR Previous EU+No → 50%
-                elif curr_country == 'EU' and curr_OMR == 'No' and prev_country == 'Non-EU' :
-                    EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
-                elif curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'No':
-                    EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
-                elif curr_country == 'Non-EU' and prev_country == 'Non-EU':
-                    EUAs.append(0.0)
-        
-                # (3) OMR to OMR voyage
-                elif curr_country == 'EU' and prev_country == 'EU' and curr_OMR == 'Yes' and prev_OMR == 'Yes':
-                    if curr_country[:2] == prev_country[:2]:
-                        EUAs.append(0.0)
-                    else:
-                        EUAs.append(round(carbon_emitted * 0.7, 3))
-        
-                # (4) Mixed EU–NonEU + OMR transitions → half rate
-                elif (curr_country == 'EU' and prev_country == 'Non-EU' and curr_OMR == 'Yes') or (curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'Yes'):
-                    EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
-        
-                else:
-                    EUAs.append(0.0)
-
-
-#------------------------------------------- Allocating 'Category' ----------------------------------------------------------------------------------            
-
-        boundary_type = []
-
-        for i in range(len(filtered_df_2)):
-        
-            if i == 0:
-                boundary_type.append("Start")
-                continue
-        
-            prev_country = filtered_df_2.loc[i-1, "Country Code"]
-            curr_country = filtered_df_2.loc[i, "Country Code"]
-            curr_OMR = filtered_df_2.loc[i, 'OMR']
-            prev_OMR = filtered_df_2.loc[i - 1, 'OMR']
-        
-            if prev_country == "EU" and curr_country == "Non-EU" and prev_OMR == "No":
-                boundary_type.append("Outbound")
-
-            elif prev_country == "EU" and curr_country == "Non-EU" and prev_OMR == "Yes":
-                boundary_type.append("Outbound")
-        
-            elif prev_country == "Non-EU" and curr_country == "EU" and curr_OMR == "No":
-                boundary_type.append("Inbound")
-
-            elif prev_country == "Non-EU" and curr_country == "EU" and curr_OMR == "Yes":
-                boundary_type.append("Inbound")
-        
-            elif prev_country == "EU" and curr_country == "EU" and prev_OMR == "No" and curr_OMR == "No":
-                boundary_type.append("Bound")
-        
-            elif prev_country == "Non-EU" and curr_country == "Non-EU":
-                boundary_type.append("Non-EU")
-
-            elif prev_country == "EU" and prev_OMR == "Yes" and curr_country == "EU" and curr_OMR == "No":
-                boundary_type.append("OMR-EU")
-
-            elif prev_country == "EU" and prev_OMR == "No" and curr_country == "EU" and curr_OMR == "Yes":
-                boundary_type.append("EU-OMR")
-
-            elif prev_country == "Non-EU" and prev_OMR == "No" and curr_country == "EU" and curr_OMR == "Yes":
-                boundary_type.append("NonEU-OMR")
-
-            elif prev_country == "EU" and prev_OMR == "Yes" and curr_country == "Non-EU" and curr_OMR == "No":
-                boundary_type.append("OMR-NonEU")
-
-            elif prev_country == "EU" and prev_OMR == "Yes" and curr_country == "EU" and curr_OMR == "Yes":
-                boundary_type.append("OMR")
-            
-            else:
-                boundary_type.append("Unknown")
-
-        filtered_df_2['EUAs'] = EUAs
-        filtered_df_2["Category"] = boundary_type
-        # Calculate summary metrics
-        start_date = filtered_df_2['phase_end_date'].min()
-        end_date = filtered_df_2['phase_end_date'].max()
-        total_co2 = round(filtered_df_2['Carbon emitted'].sum(), 3)
-        total_eua = round(filtered_df_2['EUAs'].sum(), 3)
-
-#----------------------------------- Calculating individual & Total Energy & Applicable Energy ----------------------------------------------------
-            
-        half_applicable = {'Inbound', 'Outbound', 'EU-OMR', 'OMR-EU', 'NonEU-OMR', 'OMR-NonEU'}
-
-        for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
-            con_col = f'cal_{fuel}_con'
-            fueleu_col = f'cal_FuelEU_{fuel}_cons'
-        
-            filtered_df_2[fueleu_col] = np.where(
-                filtered_df_2['Category'] == 'Bound',
-                filtered_df_2[con_col],
-                np.where(
-                    filtered_df_2['Category'].isin(half_applicable),
-                    filtered_df_2[con_col] / 2,
-                    0
-                )
-            )
-            # Round the column after assignment
-            filtered_df_2[fueleu_col] = filtered_df_2[fueleu_col].round(3)
-                
-        filtered_df_2['Energy In Scope Without Reallocation'] = filtered_df_2['cal_FuelEU_hfo_cons']*40500 + filtered_df_2['cal_FuelEU_lfo_cons']*41000 + filtered_df_2['cal_FuelEU_mgo_cons']*42700 + filtered_df_2['cal_FuelEU_lng_cons']*49100
-        filtered_df_2['WtW CO2 In Scope Without Reallocation'] = filtered_df_2['cal_FuelEU_hfo_cons']*3.71564 + filtered_df_2['cal_FuelEU_lfo_cons']*3.74709 + filtered_df_2['cal_FuelEU_mgo_cons']*3.87577 + filtered_df_2['cal_FuelEU_lng_cons']*3.69113
-        filtered_df_2['Developing Energy In Scope Without Reallocation'] = filtered_df_2['Energy In Scope Without Reallocation'].cumsum()
-        filtered_df_2['Developing WtW CO2 In Scope Without Reallocation'] = filtered_df_2['WtW CO2 In Scope Without Reallocation'].cumsum()
-
-            
-        num = filtered_df_2['Developing WtW CO2 In Scope Without Reallocation'].to_numpy(dtype='float64')
-        den = filtered_df_2['Developing Energy In Scope Without Reallocation'].to_numpy(dtype='float64')
-        
-        # Prepare an output array initialised to NaN (or 0 if you prefer)
-        out = np.full_like(num, np.nan, dtype='float64')
-        
-        # Safe division: only where den != 0 the division is performed
-        np.divide(num, den, out=out, where=den != 0)
-        
-        result1_without_reallocation = out * 10**6
-        
-        filtered_df_2['Developing Complience (GHGIE Actual) Without Reallocation'] = (
-            pd.Series(result1_without_reallocation, index=filtered_df_2.index)
-                .replace([np.inf, -np.inf], np.nan)
-                .fillna(0)
-        )
-
-
-        filtered_df_2['Developing (Compliance Balance) Without Reallocation'] = (89.34 - filtered_df_2['Developing Complience (GHGIE Actual) Without Reallocation']) * filtered_df_2['Developing Energy In Scope Without Reallocation']
-
-
-        #-------------- 2nd adjustment ------------------------
-        num2 = (filtered_df_2['Developing (Compliance Balance) Without Reallocation'] * 2400).to_numpy(dtype='float64')
-        den2 = (filtered_df_2['Developing Complience (GHGIE Actual) Without Reallocation'] * 41000).to_numpy(dtype='float64')
-        
-        # Prepare output array initialised to NaN
-        out2 = np.full_like(num2, np.nan, dtype='float64')
-        
-        # Safe division: only where den2 != 0
-        np.divide(num2, den2, out=out2, where=den2 != 0)
-        
-        result2_without_reallocation = np.abs(out2)
-        
-        filtered_df_2['Developing (Fuel EU Penalty sum) Without Reallocation'] = (
-            pd.Series(result2_without_reallocation, index=filtered_df_2.index)
-                .replace([np.inf, -np.inf], np.nan)
-                .fillna(0)
-        )
-
-
-        
-        cb_deficit_without_reallocation = filtered_df_2['Developing (Compliance Balance) Without Reallocation'].iloc[-1]
-        penalty_without_reallocation = filtered_df_2['Developing (Fuel EU Penalty sum) Without Reallocation'].iloc[-1]
-            
-
-            
-
-#-----------------------------------------------------------------------------------------------------------------------------------
-            
-        filtered_df_2['HFO Energy'] = (filtered_df_2['cal_hfo_con'].fillna(0) * 40500).round(3)
-        filtered_df_2['LFO Energy'] = (filtered_df_2['cal_lfo_con'].fillna(0) * 41000).round(3)
-        filtered_df_2['MGO Energy'] = (filtered_df_2['cal_mgo_con'].fillna(0) * 42700).round(3)
-        filtered_df_2['LNG Energy'] = (filtered_df_2['cal_lng_con'].fillna(0) * 49100).round(3)
-
-        filtered_df_2['Total Energy'] = (
-            filtered_df_2['cal_hfo_con'].fillna(0) * 40500 +
-            filtered_df_2['cal_lfo_con'].fillna(0) * 41000 +
-            filtered_df_2['cal_mgo_con'].fillna(0) * 42700 +
-            filtered_df_2['cal_lng_con'].fillna(0) * 49100
-        ).round(3)
-
-        #--------------------------- Filtering based on Inbound/Outbound in case of Fuel EU with reallocation ------------------------------
-        def get_applicable_energy(row):
-            category = str(row['Category'])
-        
-            if category == 'Non-EU':
-                return 0
-            elif category == 'Bound':
-                return row['Total Energy']
-            elif category in ['Inbound', 'Outbound', 'EU-OMR', 'OMR-EU']:
-                return row['Total Energy'] / 2
-            else:
-                return 0   # default if category is something unexpected
-
-        
-        filtered_df_2['Applicable Energy'] = filtered_df_2.apply(get_applicable_energy, axis=1).round(3)
-
-
-
-#--------------------------------------- Fuel EU efficient Energy allocation hierarchy-----------------------------------------------------------
-#----------------------------------------------- With Reallocation of Fuel ----------------------------------------------------------------------
-
-            
-
-        filtered_df_2['LNG Efficient Energy'] = np.minimum(filtered_df_2['Applicable Energy'], filtered_df_2['LNG Energy'])
-        filtered_df_2['MGO Efficient Energy'] = np.maximum(0, np.minimum(filtered_df_2['Applicable Energy'] - filtered_df_2['LNG Efficient Energy'], filtered_df_2['MGO Energy']))
-        filtered_df_2['LFO Efficient Energy'] = np.maximum(0, np.minimum(filtered_df_2['Applicable Energy'] - (filtered_df_2['LNG Efficient Energy'] + filtered_df_2['MGO Efficient Energy']) , filtered_df_2['LFO Energy']))
-        filtered_df_2['HFO Efficient Energy'] = np.maximum(0, np.minimum(filtered_df_2['Applicable Energy'] - (filtered_df_2['LNG Efficient Energy'] + filtered_df_2['MGO Efficient Energy'] + filtered_df_2['LFO Efficient Energy']) , filtered_df_2['HFO Energy']))
-
-        filtered_df_2['Total WtW CO2 In Scope'] = ((filtered_df_2['LNG Efficient Energy'] / 49100) * 3.69113) + ((filtered_df_2['MGO Efficient Energy'] / 42700) * 3.87577) + ((filtered_df_2['LFO Efficient Energy'] / 41000) * 3.74709) + ((filtered_df_2['HFO Efficient Energy'] / 40500) * 3.71564)
-        
-        
-        num = (
-            filtered_df_2['LNG Efficient Energy'] * 75.176 +
-            filtered_df_2['MGO Efficient Energy'] * 90.767 +
-            filtered_df_2['LFO Efficient Energy'] * 91.392 +
-            filtered_df_2['HFO Efficient Energy'] * 91.744
-        )
-
-
-        # Calculate safely
-        result = num / filtered_df_2['Applicable Energy']
-        
-        
-        # Replace errors (NaN, inf) and zeros with 89.34
-        filtered_df_2['GHGIE Actual44'] = result.replace([np.inf, -np.inf], np.nan)
-        filtered_df_2['GHGIE Actual44'] = filtered_df_2['GHGIE Actual44'].fillna(89.34)
-        filtered_df_2['GHGIE Actual44'] = np.where(filtered_df_2['GHGIE Actual44'] == 0, 89.34, filtered_df_2['GHGIE Actual44'])
-
-
-        filtered_df_2['Complience Balance'] = (89.34 - filtered_df_2['GHGIE Actual44'] ) * filtered_df_2['Applicable Energy']
-        
-
-        filtered_df_2['FuelEU Penalty'] = abs((filtered_df_2['Complience Balance'] * 2400)/(filtered_df_2['GHGIE Actual44'] * 41000))
-        filtered_df_2['Developing Compliance (Energy In Scope)'] = filtered_df_2['Applicable Energy'].cumsum()
-        filtered_df_2['Developing Compliance (WtW In Scope)'] = filtered_df_2['Total WtW CO2 In Scope'].cumsum()
-        
-        result1 = (filtered_df_2['Developing Compliance (WtW In Scope)'] / filtered_df_2['Developing Compliance (Energy In Scope)']) * 10**6
-
-        
-        # Replace errors (division by zero, NaN, inf) with 0
-        filtered_df_2['Developing Compliance (GHGIE Actual)'] = (
-            result1.replace([np.inf, -np.inf], np.nan)
-                    .fillna(0)
-        )
-
-
-        filtered_df_2['Developing (Compliance Balance)42'] = (89.34 - filtered_df_2['Developing Compliance (GHGIE Actual)']) * filtered_df_2['Developing Compliance (Energy In Scope)']
-        
-
-        result2 = abs((filtered_df_2['Developing (Compliance Balance)42'] * 2400)/(filtered_df_2['Developing Compliance (GHGIE Actual)'] * 41000))
-        filtered_df_2['Developing Compliance (Fuel EU Penalty Sum Value)'] = (
-            result2.replace([np.inf, -np.inf], np.nan)
-                    .fillna(0)
-        )
-
-
-
-        penalty_with_reallocation = filtered_df_2['Developing Compliance (Fuel EU Penalty Sum Value)'].iloc[-1]
-        cb_deficit_with_reallocation = filtered_df_2['Developing (Compliance Balance)42'].iloc[-1]
-
     
-
-            
-        hierarchy_df = pd.DataFrame([
-                [1, "LPG (Propane)", 49100, 73.017, 0],
-                [2, "LPG (Butane)", 49100, 73.670, 0],
-                [3, "LNG (Boiler)", 49100, 75.176, 3.69113],
-                [4, "LNG (Diesel Slow)", 49100, 76.081, 3.73556444],
-                [5, "LNG (Otto Slow)", 49100, 82.868, 4.06882274],
-                [6, "LNG (LBSI)", 49100, 86.940, 4.26877772],
-                [7, "LNG (Otto Medium)", 49100, 89.203, 4.37986382],
-                [8, "MGO", 42700, 90.767, 3.87577],
-                [9, "LFO", 41000, 91.392, 3.74709],
-                [10, "HFO", 40500, 91.744, 3.71564],
-                [11, "Methanol", 0, 100.395, 0]
-            ], columns=["Hierarchy", "Fuel Type", "LCV", "WtW GHIGE", "CO2 Eq WtW"]) #This will be used for "With reallocation" case 
-        
-        # Create summary tables
-        eua_summary = pd.DataFrame({
-            'From': [start_date.strftime('%Y-%m-%d %H:%M:%S')],
-            'To': [end_date.strftime('%Y-%m-%d %H:%M:%S')],
-            'CO₂ Emitted (mt)': [total_co2],
-            'EUAs': [total_eua]
-        })
-        
-        fueleu_summary = pd.DataFrame({
-                    'CB_Def Without Fuel Re-allocation': [f"{cb_deficit_without_reallocation:.3f}"],
-                    'Penalty (EUR) Without Fuel Re-allocation': [round(penalty_without_reallocation, 3)],
-                    'CB_Def With Fuel Re-allocation': [f"{cb_deficit_with_reallocation:.3f}"],
-                    'Penalty (EUR) With Fuel Re-allocation' : [round(penalty_with_reallocation, 3)] 
-        })
-        
-        return filtered_df_2, eua_summary, fueleu_summary
+            # (4) Mixed EU–NonEU + OMR transitions → half rate
+            elif (curr_country == 'EU' and prev_country == 'Non-EU' and curr_OMR == 'Yes') or (curr_country == 'Non-EU' and prev_country == 'EU' and prev_OMR == 'Yes'):
+                EUAs.append(round(carbon_emitted * 0.7 * 0.5, 3))
     
-    # --- Process Data and Display Results ---
-    if from_date and to_date and selected_vessel:
-        if from_date <= to_date:
-            with st.spinner("Processing vessel data..."):
-                result = process_vessel_data(selected_vessel, from_date, to_date)
-                if result is not None:
-                    filtered_df, eua_summary, fueleu_summary = result
-                else:
-                    filtered_df = eua_summary = fueleu_summary = None
-            
-            if filtered_df is not None and len(filtered_df) > 0:
-                st.markdown("<h2 class='section-header'>📊 Key Performance Indicators</h2>", unsafe_allow_html=True)
-                
-                col1, col2, col3, col4 = st.columns(4)
-                
-                with col1:
-                    st.markdown(f"""
-                    <div class="metric-card co2">
-                        <span class="metric-label">CO₂ Emissions</span>
-                        <div class="metric-value">{eua_summary['CO₂ Emitted (mt)'].iloc[0]}</div>
-                        <span class="metric-unit">metric tonnes</span>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown(f"""
-                    <div class="metric-card eua">
-                        <span class="metric-label">EUAs Required</span>
-                        <div class="metric-value">{eua_summary['EUAs'].iloc[0]}</div>
-                        <span class="metric-unit">allowances</span>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col3:
-                    st.markdown(f"""
-                    <div class="metric-card ghg">
-                        <span class="metric-label">GHG Intensity</span>
-                        <div class="metric-value">{fueleu_summary['CB_Def Without Fuel Re-allocation'].iloc[0]}</div>
-                        <span class="metric-unit">g CO₂eq/MJ</span>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col4:
-                    penalty_value = fueleu_summary['Penalty (EUR) Without Fuel Re-allocation'].iloc[0]
-                    st.markdown(f"""
-                    <div class="metric-card penalty">
-                        <span class="metric-label">FuelEU Penalty</span>
-                        <div class="metric-value">€{fueleu_summary['Penalty (EUR) Without Fuel Re-allocation'].iloc[0]}</div>
-                        <span class="metric-unit">EUR</span>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                st.markdown("<h2 class='section-header'>📋 Detailed Voyage Data</h2>", unsafe_allow_html=True)
-                
-                display_columns = [
-                    'phase_end_date', 'phase', 'Country Code', 'OMR', 'port', 'cargo_mt',
-                    'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
-                    'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn',
-                    'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con',
-                    'Carbon emitted', 'EUAs'
-                ]
-                
-                st.dataframe(
-                    filtered_df[display_columns],
-                    use_container_width=True,
-                    hide_index=True
-                )
-                
-                st.markdown("<h2 class='section-header'>📊 Summary Analysis</h2>", unsafe_allow_html=True)
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown("<h3 style='font-size: 1.1rem; color: var(--text-primary); margin: 0 0 1rem 0;'>🌍 EUA Calculation</h3>", unsafe_allow_html=True)
-                    st.dataframe(eua_summary, use_container_width=True, hide_index=True)
-                
-                with col2:
-                    st.markdown("<h3 style='font-size: 1.1rem; color: var(--text-primary); margin: 0 0 1rem 0;'>⛽ FuelEU Maritime</h3>", unsafe_allow_html=True)
-                    st.dataframe(fueleu_summary, use_container_width=True, hide_index=True)
-                
-                st.markdown("<h2 class='section-header'>💾 Export Results</h2>", unsafe_allow_html=True)
-                
-                if st.button("Save Results to Database", type="primary", use_container_width=False):
-                    try:
-                        engine = get_database_engine()
-                        
-                        # Save filtered data
-                        filtered_df.to_sql(
-                            "Cape_Ferrol_EUA_Summary",
-                            engine,
-                            if_exists="replace",
-                            index=False
-                        )
-                        
-                        # Save FuelEU summary
-                        fueleu_summary.to_sql(
-                            "Cape_Ferrol_FuelEU_summary",
-                            engine,
-                            if_exists="replace",
-                            index=False
-                        )
-                        
-                        # Create merged dataset
-                        row_repeated = pd.DataFrame([fueleu_summary.iloc[0]] * len(filtered_df)).reset_index(drop=True)
-                        merged_df = pd.concat([filtered_df.reset_index(drop=True), row_repeated], axis=1)
-                        
-                        merged_df.to_sql(
-                            "Cape_Ferrol_Merged",
-                            engine,
-                            if_exists="replace",
-                            index=False
-                        )
-                        
-                        engine.dispose()
-                        
-                        st.success("✅ Results saved to database successfully!")
-                        
-                    except Exception as e:
-                        st.error(f"❌ Error saving to database: {str(e)}")
-                
             else:
-                st.warning("⚠️ No data found for the selected vessel and date range.")
-                st.info("Please try selecting a different vessel or adjusting the date range.")
+                EUAs.append(0.0)
+
+    # Allocating 'Category'
+    boundary_type = []
+
+    for i in range(len(filtered_df_2)):
+    
+        if i == 0:
+            boundary_type.append("Start")
+            continue
+    
+        prev_country = filtered_df_2.loc[i-1, "Country Code"]
+        curr_country = filtered_df_2.loc[i, "Country Code"]
+        curr_OMR = filtered_df_2.loc[i, 'OMR']
+        prev_OMR = filtered_df_2.loc[i - 1, 'OMR']
+    
+        if prev_country == "EU" and curr_country == "Non-EU" and prev_OMR == "No":
+            boundary_type.append("Outbound")
+
+        elif prev_country == "EU" and curr_country == "Non-EU" and prev_OMR == "Yes":
+            boundary_type.append("Outbound")
+    
+        elif prev_country == "Non-EU" and curr_country == "EU" and curr_OMR == "No":
+            boundary_type.append("Inbound")
+
+        elif prev_country == "Non-EU" and curr_country == "EU" and curr_OMR == "Yes":
+            boundary_type.append("Inbound")
+    
+        elif prev_country == "EU" and curr_country == "EU" and prev_OMR == "No" and curr_OMR == "No":
+            boundary_type.append("Bound")
+    
+        elif prev_country == "Non-EU" and curr_country == "Non-EU":
+            boundary_type.append("Non-EU")
+
+        elif prev_country == "EU" and prev_OMR == "Yes" and curr_country == "EU" and curr_OMR == "No":
+            boundary_type.append("OMR-EU")
+
+        elif prev_country == "EU" and prev_OMR == "No" and curr_country == "EU" and curr_OMR == "Yes":
+            boundary_type.append("EU-OMR")
+
+        elif prev_country == "Non-EU" and prev_OMR == "No" and curr_country == "EU" and curr_OMR == "Yes":
+            boundary_type.append("NonEU-OMR")
+
+        elif prev_country == "EU" and prev_OMR == "Yes" and curr_country == "Non-EU" and curr_OMR == "No":
+            boundary_type.append("OMR-NonEU")
+
+        elif prev_country == "EU" and prev_OMR == "Yes" and curr_country == "EU" and curr_OMR == "Yes":
+            boundary_type.append("OMR")
         
         else:
-            st.error("❌ 'To Date' must be on or after 'From Date'.")
+            boundary_type.append("Unknown")
+
+    filtered_df_2['EUAs'] = EUAs
+    filtered_df_2["Category"] = boundary_type
     
+    # Calculate summary metrics
+    start_date = filtered_df_2['phase_end_date'].min()
+    end_date = filtered_df_2['phase_end_date'].max()
+    total_co2 = round(filtered_df_2['Carbon emitted'].sum(), 3)
+    total_eua = round(filtered_df_2['EUAs'].sum(), 3)
+
+    # Calculating individual & Total Energy & Applicable Energy
+    half_applicable = {'Inbound', 'Outbound', 'EU-OMR', 'OMR-EU', 'NonEU-OMR', 'OMR-NonEU'}
+
+    for fuel in ['hfo', 'lfo', 'mgo', 'lng']:
+        con_col = f'cal_{fuel}_con'
+        fueleu_col = f'cal_FuelEU_{fuel}_cons'
+    
+        con_values = filtered_df_2[con_col].fillna(0.0).astype('float64')
+        
+        filtered_df_2[fueleu_col] = np.where(
+            filtered_df_2['Category'] == 'Bound',
+            con_values,
+            np.where(
+                filtered_df_2['Category'].isin(half_applicable),
+                con_values / 2.0,
+                0.0
+            )
+        )
+        # Round the column after assignment
+        filtered_df_2[fueleu_col] = filtered_df_2[fueleu_col].round(3).astype('float64')
+            
+    filtered_df_2['Energy In Scope Without Reallocation'] = (
+        filtered_df_2['cal_FuelEU_hfo_cons'].astype('float64') * 40500 + 
+        filtered_df_2['cal_FuelEU_lfo_cons'].astype('float64') * 41000 + 
+        filtered_df_2['cal_FuelEU_mgo_cons'].astype('float64') * 42700 + 
+        filtered_df_2['cal_FuelEU_lng_cons'].astype('float64') * 49100
+    )
+    
+    filtered_df_2['WtW CO2 In Scope Without Reallocation'] = (
+        filtered_df_2['cal_FuelEU_hfo_cons'].astype('float64') * 3.71564 + 
+        filtered_df_2['cal_FuelEU_lfo_cons'].astype('float64') * 3.74709 + 
+        filtered_df_2['cal_FuelEU_mgo_cons'].astype('float64') * 3.87577 + 
+        filtered_df_2['cal_FuelEU_lng_cons'].astype('float64') * 3.69113
+    )
+    
+    filtered_df_2['Developing Energy In Scope Without Reallocation'] = filtered_df_2['Energy In Scope Without Reallocation'].cumsum()
+    filtered_df_2['Developing WtW CO2 In Scope Without Reallocation'] = filtered_df_2['WtW CO2 In Scope Without Reallocation'].cumsum()
+
+        
+    num = filtered_df_2['Developing WtW CO2 In Scope Without Reallocation'].to_numpy(dtype='float64')
+    den = filtered_df_2['Developing Energy In Scope Without Reallocation'].to_numpy(dtype='float64')
+    
+    # Prepare an output array initialised to NaN
+    out = np.full_like(num, np.nan, dtype='float64')
+    
+    # Safe division: only where den != 0 the division is performed
+    np.divide(num, den, out=out, where=den != 0)
+    
+    result1_without_reallocation = out * 10**6
+    
+    filtered_df_2['Developing Complience (GHGIE Actual) Without Reallocation'] = (
+        pd.Series(result1_without_reallocation, index=filtered_df_2.index)
+            .replace([np.inf, -np.inf], np.nan)
+            .fillna(0.0)
+            .astype('float64')
+    )
+
+    filtered_df_2['Developing (Compliance Balance) Without Reallocation'] = (
+        (89.34 - filtered_df_2['Developing Complience (GHGIE Actual) Without Reallocation']) * 
+        filtered_df_2['Developing Energy In Scope Without Reallocation']
+    )
+
+    # 2nd adjustment
+    num2 = (filtered_df_2['Developing (Compliance Balance) Without Reallocation'] * 2400).to_numpy(dtype='float64')
+    den2 = (filtered_df_2['Developing Complience (GHGIE Actual) Without Reallocation'] * 41000).to_numpy(dtype='float64')
+    
+    # Prepare output array initialised to NaN
+    out2 = np.full_like(num2, np.nan, dtype='float64')
+    
+    # Safe division: only where den2 != 0
+    np.divide(num2, den2, out=out2, where=den2 != 0)
+    
+    result2_without_reallocation = np.abs(out2)
+    
+    filtered_df_2['Developing (Fuel EU Penalty sum) Without Reallocation'] = (
+        pd.Series(result2_without_reallocation, index=filtered_df_2.index)
+            .replace([np.inf, -np.inf], np.nan)
+            .fillna(0.0)
+            .astype('float64')
+    )
+
+    cb_deficit_without_reallocation = filtered_df_2['Developing (Compliance Balance) Without Reallocation'].iloc[-1]
+    penalty_without_reallocation = filtered_df_2['Developing (Fuel EU Penalty sum) Without Reallocation'].iloc[-1]
+
+    filtered_df_2['HFO Energy'] = (filtered_df_2['cal_hfo_con'].fillna(0.0).astype('float64') * 40500).round(3)
+    filtered_df_2['LFO Energy'] = (filtered_df_2['cal_lfo_con'].fillna(0.0).astype('float64') * 41000).round(3)
+    filtered_df_2['MGO Energy'] = (filtered_df_2['cal_mgo_con'].fillna(0.0).astype('float64') * 42700).round(3)
+    filtered_df_2['LNG Energy'] = (filtered_df_2['cal_lng_con'].fillna(0.0).astype('float64') * 49100).round(3)
+
+    filtered_df_2['Total Energy'] = (
+        filtered_df_2['cal_hfo_con'].fillna(0.0).astype('float64') * 40500 +
+        filtered_df_2['cal_lfo_con'].fillna(0.0).astype('float64') * 41000 +
+        filtered_df_2['cal_mgo_con'].fillna(0.0).astype('float64') * 42700 +
+        filtered_df_2['cal_lng_con'].fillna(0.0).astype('float64') * 49100
+    ).round(3)
+
+    # Filtering based on Inbound/Outbound in case of Fuel EU with reallocation
+    def get_applicable_energy(row):
+        category = str(row['Category'])
+    
+        if category == 'Non-EU':
+            return 0.0
+        elif category == 'Bound':
+            return float(row['Total Energy'])
+        elif category in ['Inbound', 'Outbound', 'EU-OMR', 'OMR-EU']:
+            return float(row['Total Energy']) / 2.0
+        else:
+            return 0.0
+
+    filtered_df_2['Applicable Energy'] = filtered_df_2.apply(get_applicable_energy, axis=1).round(3)
+
+    # Continue with remaining calculations (cargo calculations, etc.)
+
+    return final_df, filtered_df_2, vessel_type
+
+# --- Process and Display ---
+if selected_vessel and from_date and to_date:
+    with st.spinner('Processing vessel data...'):
+        final_df, filtered_df, vessel_type = process_vessel_data(
+            selected_vessel, from_date, to_date
+        )
+    
+    if final_df is not None and filtered_df is not None:
+        # Calculate summary
+        start_date = filtered_df['phase_end_date'].min()
+        end_date = filtered_df['phase_end_date'].max()
+        total_co2 = round(filtered_df['Carbon emitted'].sum(), 3)
+        total_eua = round(filtered_df['EUAs'].sum(), 3)
+        
+        # Summary Cards
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.markdown(f"""
+            <div class="info-card">
+                <h3>Vessel</h3>
+                <p>{selected_vessel}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown(f"""
+            <div class="info-card">
+                <h3>Total CO₂</h3>
+                <p>{total_co2:,.1f} t</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown(f"""
+            <div class="info-card">
+                <h3>Total EUAs</h3>
+                <p>{total_eua:,.1f}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            st.markdown(f"""
+            <div class="info-card">
+                <h3>Vessel Type</h3>
+                <p>{vessel_type if vessel_type else 'N/A'}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Display Tables in Tabs
+        tab1, tab2 = st.tabs(["📊 EUA Summary", "⚡ FuelEU Analysis"])
+        
+        with tab1:
+            st.subheader("Vessel EUA Summary")
+            
+            display_columns = [
+                'phase_end_date', 'phase', 'Country Code', 'OMR', 'port', 'cargo_mt',
+                'hfo_rob', 'lfo_rob', 'mgo_rob', 'lng_rob',
+                'hfo_bdn', 'lfo_bdn', 'mgo_bdn', 'lng_bdn',
+                'cal_hfo_con', 'cal_lfo_con', 'cal_mgo_con', 'cal_lng_con',
+                'Carbon emitted', 'EUAs'
+            ]
+            
+            st.dataframe(
+                filtered_df[display_columns],
+                use_container_width=True,
+                height=500
+            )
+            
+            # Save to database button
+            if st.button("Save Results to Database", type="primary", use_container_width=False):
+                try:
+                    engine = get_database_engine()
+                    
+                    # Save filtered data
+                    filtered_df.to_sql(
+                        "Cape_Ferrol_EUA_Summary",
+                        engine,
+                        if_exists="replace",
+                        index=False
+                    )
+                    
+                    engine.dispose()
+                    
+                    st.success("✅ Results saved to database successfully!")
+                    
+                except Exception as e:
+                    st.error(f"❌ Error saving to database: {str(e)}")
+        
+        with tab2:
+            st.subheader("FuelEU Maritime Analysis")
+            st.info("Detailed FuelEU calculations and compliance analysis")
+            st.dataframe(
+                filtered_df[[
+                    'phase_end_date', 'Category', 'Total Energy', 'Applicable Energy',
+                    'Energy In Scope Without Reallocation', 
+                    'Developing Complience (GHGIE Actual) Without Reallocation',
+                    'Developing (Compliance Balance) Without Reallocation',
+                    'Developing (Fuel EU Penalty sum) Without Reallocation'
+                ]],
+                use_container_width=True,
+                height=500
+            )
     else:
-        st.info("👆 Please select a vessel and date range from the sidebar to view results.")
-
+        st.warning("No data found for the selected vessel and date range.")
 else:
-    st.error("❌ Failed to load data from database. Please check your connection settings.")
-    st.info("Make sure your SUPABASE_DB_URL environment variable is correctly set.")
-
-# --- Footer ---
-st.markdown("""
-<div class='footer'>
-    🚢 Vessel EUAs & FuelEU Maritime Penalty Calculator | Built with Streamlit
-</div>
-""", unsafe_allow_html=True)
+    st.info("👈 Please select a vessel and date range from the sidebar to begin analysis.")
